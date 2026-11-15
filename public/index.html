@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>INCLUAI ✦ Real Feels, Zero Filter — Inclusive Workplace Intelligence 2.0</title>
+<title>INCLUAI — Secure AI Workplace Intelligence Platform</title>
+<meta name="description" content="INCLUAI is a role-based workplace support prototype with policy search, AI assistance, reporting, task tracking, and analytics.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -747,6 +748,8 @@ body.focus-mode :focus{
 
 @media(max-width:980px){
   nav .nav-links{display:none}
+  nav{width:calc(100% - 24px);padding:10px 14px}
+  nav .nav-actions .btn{padding:9px 14px!important;font-size:12px!important}
   .comp-row{grid-template-columns:1fr;gap:10px}
   .comp-vs{margin:0 auto}
   .timeline-stepper{grid-template-columns:1fr 1fr}
@@ -754,6 +757,14 @@ body.focus-mode :focus{
   .footer-cols{grid-template-columns:1fr 1fr}
   .c3{transform:rotateY(calc(var(--k)*60deg)) translateZ(250px)}
   .ring{width:180px}
+}
+@media(max-width:560px){
+  nav{gap:8px;padding:8px 12px}
+  .logo{font-size:16px}
+  .logo-badge{display:none}
+  nav .nav-actions .btn{padding:8px 11px!important;font-size:11px!important}
+  .universe-hud{flex-wrap:wrap;justify-content:center;max-width:100%}
+  main{padding-left:16px;padding-right:16px}
 }
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
@@ -785,24 +796,15 @@ body.focus-mode :focus{
   </a>
   <ul class="nav-links">
     <li><a href="#features" data-cur="FEATURES">Features</a></li>
-    <li><a href="#problem-solution" data-cur="SOLUTION">Why INCLUAI</a></li>
     <li><a href="#how-it-works" data-cur="PIPELINE">How It Works</a></li>
     <li><a href="#copilot-demo" data-cur="DEMO">AI Copilot</a></li>
-    <li><a href="#impact" data-cur="IMPACT">Impact</a></li>
+    <li><a href="#walkthrough" data-cur="SHOWCASE">Demo Walkthrough</a></li>
     <li><a href="#trust" data-cur="TRUST">Trust &amp; Privacy</a></li>
-    <li><a href="#accessibility" data-cur="A11Y">Accessibility</a></li>
-    <li><a href="#roadmap" data-cur="ROADMAP">Roadmap</a></li>
     <li><a href="#faq" data-cur="FAQ">FAQ</a></li>
   </ul>
   <div class="nav-actions">
-    <a class="btn" href="/dataset.html" target="_blank" data-mag data-cur="DATA" style="padding:10px 18px;font-size:13px;border-color:rgba(25,240,196,0.35);color:var(--teal);">
-      <span>🗃️ Dataset (4,653) ↗</span>
-    </a>
     <a class="btn" href="/app" data-mag data-cur="APP" style="padding:10px 18px;font-size:13px;border-color:rgba(0,229,255,0.4);color:var(--b);">
       <span>Workplace App ↗</span>
-    </a>
-    <a class="btn p" href="#join" data-mag data-cur="JOIN" style="padding:10px 20px;font-size:13px">
-      <span>Join Waitlist →</span>
     </a>
   </div>
 </nav>
@@ -812,7 +814,7 @@ body.focus-mode :focus{
   <!-- 01 HERO SECTION WITH HOVER LENS REVEAL & 3D UNIVERSE HUD                  -->
   <!-- ========================================================================= -->
   <section class="hero" id="home">
-    <div class="eyebrow">✦ Welcome to inclusive workplace intelligence 2.0</div>
+    <div class="eyebrow">✦ SWOC project showcase · Workplace intelligence</div>
     
     <!-- Hover Lens Reveal Title -->
     <div class="lens" id="lens">
@@ -821,14 +823,14 @@ body.focus-mode :focus{
     </div>
 
     <p class="sub">
-      For everyone who typed a reply, deleted it, and sent a thumbs up instead. A workplace support prototype with policy search, confidential reporting, and accessibility-focused tools.
+      A role-based workplace support prototype that brings policy search, AI assistance, employee reporting, task tracking, and analytics into one place. Explore the demo and its security boundaries.
     </p>
 
     <div class="cta">
-      <a class="btn p" href="/app" data-mag data-cur="ENTER"><span>Open Workplace Platform 2.0 ↗</span></a>
-      <a class="btn" href="#copilot-demo" data-mag data-cur="TRY"><span>Try Live AI Copilot ⚡</span></a>
-      <a class="btn" href="/dataset.html" target="_blank" data-mag data-cur="DATA" style="border-color:rgba(25,240,196,0.4);color:var(--teal);"><span>🗃️ Explore Dataset (4,653) ↗</span></a>
-      <a class="btn" href="#problem-solution" data-mag data-cur="VIEW"><span>See Why INCLUAI</span></a>
+      <a class="btn p" href="/app" data-mag data-cur="ENTER"><span>Explore the Workplace App ↗</span></a>
+      <a class="btn" href="#copilot-demo" data-mag data-cur="TRY"><span>Try the Policy Assistant ⚡</span></a>
+      <a class="btn" href="#walkthrough" data-mag data-cur="VIEW"><span>60-second Demo Guide</span></a>
+      <a class="btn" href="https://github.com/jgourav8900-droid/incluai-2.0" target="_blank" rel="noopener noreferrer" data-mag data-cur="CODE"><span>View Source on GitHub ↗</span></a>
     </div>
 
     <!-- Interactive 3D INCLUAI Universe HUD Controls -->
@@ -850,10 +852,10 @@ body.focus-mode :focus{
       <span>Zero Filter</span><span>✦</span>
       <span>Grounded AI Copilot</span><span>✦</span>
       <span>Psychological Safety</span><span>✦</span>
-      <span>4,653 Verified Records</span><span>✦</span>
+      <span>Role-Based Access</span><span>✦</span>
       <span>Workplace Task Tracking</span><span>✦</span>
-      <span>Private-by-design reporting</span><span>✦</span>
-      <span>AI answers may need verification</span><span>✦</span>
+      <span>Anonymous Report Option</span><span>✦</span>
+      <span>AI answers need verification</span><span>✦</span>
       <span>Real Feels</span><span>✦</span>
       <span>Zero Filter</span><span>✦</span>
       <span>Grounded AI Copilot</span><span>✦</span>
@@ -873,31 +875,31 @@ body.focus-mode :focus{
       <article class="card glass tilt" data-cur="VIEW">
         <div class="gl"></div>
         <i>01</i>
-        <h3>real-time signals</h3>
-        <p>Live telemetry across people, policy and platform — always transparently in view so no voice gets lost.</p>
+        <h3>workplace overview</h3>
+        <p>Explore dashboard views for workplace activity and operational metrics using demo data.</p>
         <div class="screen"></div>
       </article>
 
       <article class="card glass tilt" data-cur="VIEW">
         <div class="gl"></div>
         <i>02</i>
-        <h3>actionable insights</h3>
-        <p>Patterns surfaced early from workplace feedback so inclusion decisions happen before friction ever arises.</p>
+        <h3>human-reviewed analytics</h3>
+        <p>Review aggregate analytics as decision support; do not use this prototype to make employment decisions.</p>
         <div class="screen"></div>
       </article>
 
       <article class="card glass tilt" data-cur="VIEW">
         <div class="gl"></div>
         <i>03</i>
-        <h3>automated reporting</h3>
-        <p>Accessibility compliance, DEI progress, and wellbeing reports compiled at a glance with strict audit trails.</p>
+        <h3>role-aware workflows</h3>
+        <p>Use task tracking, report review, and knowledge search within the current role permissions.</p>
         <div class="screen"></div>
       </article>
 
       <article class="card glass tilt" data-cur="VIEW">
         <div class="gl"></div>
         <i>04</i>
-        <h3>confidential safety</h3>
+        <h3>anonymous report option</h3>
         <p>Anonymous submissions are stored without the submitting account ID. Report text may still identify its author, so avoid including identifying details when anonymity matters.</p>
         <div class="screen"></div>
       </article>
@@ -909,8 +911,8 @@ body.focus-mode :focus{
   <!-- ========================================================================= -->
   <section id="problem-solution">
     <div class="eyebrow">// the workplace divide</div>
-    <h2>The Broken Reality vs. The INCLUAI Standard</h2>
-    <p class="sec-sub">How legacy workplace friction is transformed into grounded, intelligent psychological safety.</p>
+    <h2>Workplace Support in One Prototype</h2>
+    <p class="sec-sub">A project concept for bringing policy search, reporting, and task tracking into a shared experience.</p>
 
     <div class="comparison-grid">
       <!-- Pair 1 -->
@@ -919,15 +921,15 @@ body.focus-mode :focus{
           <span class="comp-tag p-tag">The Legacy Reality</span>
           <h3 style="font:700 17px Unbounded;margin-bottom:8px;">The Black Hole HR Ticket Void</h3>
           <p style="font-size:14px;color:var(--muted);line-height:1.55;">
-            Employees wait 2 to 3 weeks for basic policy answers. Queries vanish into ticketing backlogs with no visibility, leading to confusion and disengagement.
+            Workplace policies and support processes can be difficult to navigate when information is spread across documents and tools.
           </p>
         </div>
         <div class="comp-vs">VS</div>
         <div class="comp-card solution glass tilt" data-cur="SOLUTION">
-          <span class="comp-tag s-tag">The INCLUAI Standard</span>
+          <span class="comp-tag s-tag">Prototype response</span>
           <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Policy Search &amp; AI Assistance</h3>
           <p style="font-size:14px;color:var(--text);line-height:1.55;">
-            AI responses can include citations to indexed policy documents, but may be incomplete or incorrect. Verify important answers against the source.
+            Search configured policy documents and review any citations. AI responses can be incomplete or incorrect; verify important answers against the source.
           </p>
         </div>
       </div>
@@ -938,15 +940,15 @@ body.focus-mode :focus{
           <span class="comp-tag p-tag">The Legacy Reality</span>
           <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Fear of Retaliation &amp; Silence</h3>
           <p style="font-size:14px;color:var(--muted);line-height:1.55;">
-            Employees stay silent about accessibility barriers and micro-inequities because "anonymous" survey tools still track emails, IPs, and managerial hierarchies.
+            Employees may need a way to raise workplace concerns without attaching their account to a report.
           </p>
         </div>
         <div class="comp-vs">VS</div>
         <div class="comp-card solution glass tilt" data-cur="SOLUTION">
-          <span class="comp-tag s-tag">The INCLUAI Standard</span>
+          <span class="comp-tag s-tag">Prototype response</span>
           <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Anonymous Report Submission</h3>
           <p style="font-size:14px;color:var(--text);line-height:1.55;">
-            Anonymous submissions omit the submitter account ID. Report text may still identify its author; avoid including identifying details when anonymity matters.
+            The anonymous option omits the submitter account ID. Submitted text may still identify its author; avoid identifying details when anonymity matters.
           </p>
         </div>
       </div>
@@ -962,10 +964,10 @@ body.focus-mode :focus{
         </div>
         <div class="comp-vs">VS</div>
         <div class="comp-card solution glass tilt" data-cur="SOLUTION">
-          <span class="comp-tag s-tag">The INCLUAI Standard</span>
-          <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Live Knowledge Vector Graph</h3>
+          <span class="comp-tag s-tag">Prototype response</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Company Knowledge Base</h3>
           <p style="font-size:14px;color:var(--text);line-height:1.55;">
-            Centralized policy repository with real-time vector embeddings, multi-format export, and continuous compliance synchronization across all departments.
+            Upload supported documents to a company-scoped knowledge base and search their extracted text. External repository integrations are not included in this prototype.
           </p>
         </div>
       </div>
@@ -981,10 +983,10 @@ body.focus-mode :focus{
         </div>
         <div class="comp-vs">VS</div>
         <div class="comp-card solution glass tilt" data-cur="SOLUTION">
-          <span class="comp-tag s-tag">The INCLUAI Standard</span>
-          <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Autonomous 2.4-Day SLA Pipeline</h3>
+          <span class="comp-tag s-tag">Prototype response</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Workplace Task Tracking</h3>
           <p style="font-size:14px;color:var(--text);line-height:1.55;">
-            Automated task dispatching routes accommodation requests directly to authorized facilities and IT leads, enforcing our benchmark 2.4-day resolution SLA.
+            Track workplace tasks and update their status. The prototype does not automate accommodation routing or guarantee a resolution time.
           </p>
         </div>
       </div>
@@ -996,30 +998,30 @@ body.focus-mode :focus{
   <!-- ========================================================================= -->
   <section id="how-it-works">
     <div class="eyebrow">// architecture &amp; process</div>
-    <h2>How INCLUAI Works: 4-Stage Neural Pipeline</h2>
-    <p class="sec-sub">From fragmented company knowledge to verified employee confidence in milliseconds.</p>
+    <h2>How the Prototype Works</h2>
+    <p class="sec-sub">A simple walkthrough of the current document search, reporting, and task workflows.</p>
 
     <!-- Stage Navigation Buttons -->
     <div class="timeline-stepper">
       <div class="step-nav-btn active" id="stepBtn0" onclick="showTimelineStep(0)" data-cur="STEP 1">
         <div class="step-num">01</div>
-        <div class="step-title">Multi-Source Ingestion</div>
-        <div class="step-desc">Handbooks, Notion, HRIS &amp; policies indexed.</div>
+        <div class="step-title">Policy Documents</div>
+        <div class="step-desc">Upload supported files to the knowledge base.</div>
       </div>
       <div class="step-nav-btn" id="stepBtn1" onclick="showTimelineStep(1)" data-cur="STEP 2">
         <div class="step-num">02</div>
-        <div class="step-title">Neural Vector RAG</div>
-        <div class="step-desc">Zero-hallucination semantic search grounding.</div>
+        <div class="step-title">Search &amp; AI</div>
+        <div class="step-desc">Review search matches and optional citations.</div>
       </div>
       <div class="step-nav-btn" id="stepBtn2" onclick="showTimelineStep(2)" data-cur="STEP 3">
         <div class="step-num">03</div>
-        <div class="step-title">Report Privacy</div>
-        <div class="step-desc">Anonymous submissions omit the submitter account ID.</div>
+        <div class="step-title">Report Submission</div>
+        <div class="step-desc">Choose whether to attach an account to a report.</div>
       </div>
       <div class="step-nav-btn" id="stepBtn3" onclick="showTimelineStep(3)" data-cur="STEP 4">
         <div class="step-num">04</div>
-        <div class="step-title">Closed-Loop Resolution</div>
-        <div class="step-desc">2.4-day SLA dispatching &amp; live telemetry.</div>
+        <div class="step-title">Task Tracking</div>
+        <div class="step-desc">Create and update tasks in the workplace app.</div>
       </div>
     </div>
 
@@ -1027,25 +1029,24 @@ body.focus-mode :focus{
     <div class="glass timeline-preview-box" id="timelinePreview">
       <div>
         <span class="comp-tag s-tag" id="previewBadge">STAGE 01 &middot; DATA INGESTION</span>
-        <h3 style="font:800 22px Unbounded;margin:10px 0 14px;" id="previewTitle">Enterprise Multi-Source Knowledge Ingestion</h3>
+        <h3 style="font:800 22px Unbounded;margin:10px 0 14px;" id="previewTitle">Policy Document Search</h3>
         <p style="color:var(--text);font-size:15px;line-height:1.65;margin-bottom:18px;" id="previewDesc">
-          INCLUAI connects seamlessly to your enterprise repositories (Google Drive, Notion, Workday, PDF manuals). It parses structural hierarchies, sections, and legal clauses into cryptographically hashed semantic units.
+          Upload supported documents to the company knowledge base and search their extracted content. External repository integrations are not included.
         </p>
         <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;font-size:13.5px;color:var(--muted);" id="previewList">
-          <li>✔ Automatic version drift detection when policies update</li>
-          <li>✔ Search across the organization’s configured policy documents</li>
-          <li>✔ Role-based access checks for restricted features</li>
+          <li>✔ Search uploaded policy documents</li>
+          <li>✔ Review available citations against source text</li>
+          <li>✔ Verify important answers; AI may be inaccurate</li>
         </ul>
       </div>
       <div>
-        <div class="preview-console" id="previewCode">// INCLUAI Ingestion Engine v2.0
-const docBatch = await ragService.indexDocument({
-  title: "Hybrid Remote Work Policy 2026",
-  companyId: "COMP001",
-  chunks: 48,
-  embeddings: "Google GenAI when configured"
-});
-// Status: 48 chunks indexed, cosine threshold 0.10</div>
+        <div class="preview-console" id="previewCode">// Policy document search
+const matches = ragService.searchCompanyDocuments(
+  companyId,
+  userQuestion
+);
+// Review matching source documents
+// AI answers may need verification</div>
       </div>
     </div>
   </section>
@@ -1062,10 +1063,10 @@ const docBatch = await ragService.indexDocument({
       <div class="copilot-demo-header">
         <div style="display:flex;align-items:center;gap:10px;">
           <div style="width:10px;height:10px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal);"></div>
-          <span style="font:700 12.5px 'JetBrains Mono',monospace;color:var(--b);">INCLUAI NEURAL COPILOT 2.0 &middot; GOOGLE GEMINI SERVER</span>
+          <span style="font:700 12.5px 'JetBrains Mono',monospace;color:var(--b);">INCLUAI POLICY ASSISTANT · DEMO MODE</span>
         </div>
         <span style="font-size:11px;color:var(--teal);font-family:'JetBrains Mono',monospace;display:inline-flex;align-items:center;gap:4px;">
-          <span>⚡ Fast Mode Active</span>
+          <span>Provider depends on server configuration</span>
         </span>
       </div>
 
@@ -1075,12 +1076,12 @@ const docBatch = await ragService.indexDocument({
           <button class="pill-btn" onclick="sendDemoPrompt('Can I work remotely from another state?')">📍 Remote work from another state?</button>
           <button class="pill-btn" onclick="sendDemoPrompt('How do I request an ergonomic standing desk?')">🪑 Ergonomic desk accommodation</button>
           <button class="pill-btn" onclick="sendDemoPrompt('What is our company parental leave policy?')">👶 Parental leave policy</button>
-          <button class="pill-btn" onclick="sendDemoPrompt('How does confidential barrier reporting protect me?')">🛡️ Anonymity protection</button>
+          <button class="pill-btn" onclick="sendDemoPrompt('What does the anonymous reporting option omit?')">🛡️ Reporting privacy</button>
         </div>
 
         <div class="copilot-chat-feed" id="demoChatFeed">
           <div class="chat-bubble ai">
-            <strong>INCLUAI Copilot:</strong> Hello! I am your AI Workplace Assistant. Every answer I provide is strictly grounded in verified company documents with exact policy citations. What workplace question can I resolve for you today?
+            <strong>INCLUAI Copilot:</strong> Ask about the configured workplace policies. Responses may be incomplete or incorrect; check any citation against the source before relying on an answer.
           </div>
         </div>
 
@@ -1099,53 +1100,44 @@ const docBatch = await ragService.indexDocument({
   <!-- ========================================================================= -->
   <section id="impact">
     <div class="eyebrow">// telemetry &amp; impact</div>
-    <h2>Measurable Impact &amp; Intelligence</h2>
-    <p class="sec-sub">Verified enterprise data metrics demonstrating cultural transformation at scale.</p>
+    <h2>What You Can Explore</h2>
+    <p class="sec-sub">A product walkthrough, not measured customer outcomes. The screens use prototype/demo data.</p>
 
     <div class="stats-grid">
-      <div class="stat-card glass tilt" data-cur="99.4%">
+      <div class="stat-card glass tilt" data-cur="01">
         <div class="gl"></div>
-        <div class="stat-val" id="impactAccuracy">99.4%</div>
-        <div class="stat-lbl">Grounding Accuracy</div>
-        <div class="stat-sub">Zero AI hallucination verified by policy RAG</div>
+        <div class="stat-val">01</div>
+        <div class="stat-lbl">Policy Assistant</div>
+        <div class="stat-sub">Ask about indexed documents; verify responses against sources.</div>
       </div>
 
-      <div class="stat-card glass tilt" data-cur="2.4d">
+      <div class="stat-card glass tilt" data-cur="02">
         <div class="gl"></div>
-        <div class="stat-val" style="background:linear-gradient(90deg,var(--teal),var(--b));-webkit-background-clip:text;background-clip:text;" id="impactSLA">2.4 Days</div>
-        <div class="stat-lbl">Average Resolution SLA</div>
-        <div class="stat-sub">Down from industry average of 14.2 days</div>
+        <div class="stat-val" style="background:linear-gradient(90deg,var(--teal),var(--b));-webkit-background-clip:text;background-clip:text;">02</div>
+        <div class="stat-lbl">Workplace Reports</div>
+        <div class="stat-sub">Submit a report and review it according to your role.</div>
       </div>
 
-      <div class="stat-card glass tilt" data-cur="4,653">
+      <div class="stat-card glass tilt" data-cur="03">
         <div class="gl"></div>
-        <div class="stat-val" style="background:linear-gradient(90deg,var(--c),var(--amber));-webkit-background-clip:text;background-clip:text;" id="impactRecords">4,653+</div>
-        <div class="stat-lbl">Analyzed Workplace Records</div>
-        <div class="stat-sub">Across employee sentiment, tasks and inclusion</div>
+        <div class="stat-val" style="background:linear-gradient(90deg,var(--c),var(--amber));-webkit-background-clip:text;background-clip:text;">03</div>
+        <div class="stat-lbl">Role-Based Access</div>
+        <div class="stat-sub">Compare employee, HR, and administrator capabilities.</div>
       </div>
 
-      <div class="stat-card glass tilt" data-cur="88%">
+      <div class="stat-card glass tilt" data-cur="04">
         <div class="gl"></div>
-        <div class="stat-val" style="background:linear-gradient(90deg,var(--a),var(--c));-webkit-background-clip:text;background-clip:text;" id="impactEscalation">88%</div>
-        <div class="stat-lbl">Friction Reduction</div>
-        <div class="stat-sub">Workplace concerns solved before escalation</div>
+        <div class="stat-val" style="background:linear-gradient(90deg,var(--a),var(--c));-webkit-background-clip:text;background-clip:text;">04</div>
+        <div class="stat-lbl">Analytics &amp; Tasks</div>
+        <div class="stat-sub">Explore dashboards and task status workflows with demo data.</div>
       </div>
     </div>
 
-    <!-- Interactive Visual Chart -->
-    <div class="glass chart-container">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px;">
-        <h3 style="font:700 18px Unbounded;" id="chartTitle">Resolution Turnaround Speed (Days to Resolve)</h3>
-        <div class="chart-tabs">
-          <button class="chart-tab active" onclick="switchChartTab('resolution', this)">Resolution Speed</button>
-          <button class="chart-tab" onclick="switchChartTab('sentiment', this)">Inclusion Index</button>
-          <button class="chart-tab" onclick="switchChartTab('accommodations', this)">Accommodation SLA</button>
-        </div>
-      </div>
-
-      <div id="chartGraphic" style="min-height:220px;display:flex;align-items:flex-end;justify-content:space-around;padding:20px;border-radius:18px;background:rgba(0,0,0,0.4);border:1px solid var(--line);">
-        <!-- Injected via JS switchChartTab -->
-      </div>
+    <div class="glass chart-container" style="text-align:center;">
+      <h3 style="font:700 18px Unbounded;margin-bottom:12px;">Prototype status</h3>
+      <p style="color:var(--muted);max-width:760px;margin:0 auto;line-height:1.7;">
+        INCLUAI is a learning and demonstration project. It has not been validated with customer outcome data, independently security-audited, or certified for regulatory compliance.
+      </p>
     </div>
   </section>
 
@@ -1154,44 +1146,44 @@ const docBatch = await ragService.indexDocument({
   <!-- ========================================================================= -->
   <section id="sentiment">
     <div class="eyebrow">// collective telemetry</div>
-    <h2>Real-Time Sentiment Intelligence</h2>
-    <p class="sec-sub">Departmental health telemetry enabling early proactive workplace intervention.</p>
+    <h2>Analytics for Human Review</h2>
+    <p class="sec-sub">Use aggregate dashboard views as a starting point for discussion—not as an automated employment decision.</p>
 
     <div class="sentiment-grid">
-      <div class="sentiment-card glass tilt" data-cur="DEPT">
+      <div class="sentiment-card glass tilt" data-cur="FEATURE">
         <div class="gl"></div>
-        <span class="comp-tag s-tag">Engineering</span>
-        <div class="sent-score">96%</div>
-        <div style="font-size:13px;color:var(--text);font-weight:600;">Psychological Safety &middot; 423 signals</div>
-        <div class="sent-bar-bg"><div class="sent-bar-fill" style="width:96%;"></div></div>
-        <div style="font-size:12px;color:var(--muted);">+4.2% improvement after async standup shift</div>
+        <span class="comp-tag s-tag">Dashboard</span>
+        <div class="sent-score">01</div>
+        <div style="font-size:13px;color:var(--text);font-weight:600;">Review available workplace metrics</div>
+        <div class="sent-bar-bg"><div class="sent-bar-fill" style="width:100%;"></div></div>
+        <div style="font-size:12px;color:var(--muted);">Displayed values are prototype data.</div>
       </div>
 
-      <div class="sentiment-card glass tilt" data-cur="DEPT">
+      <div class="sentiment-card glass tilt" data-cur="FEATURE">
         <div class="gl"></div>
-        <span class="comp-tag s-tag">Human Resources</span>
-        <div class="sent-score" style="color:var(--b);">98%</div>
-        <div style="font-size:13px;color:var(--text);font-weight:600;">Policy Clarity &middot; 189 signals</div>
-        <div class="sent-bar-bg"><div class="sent-bar-fill" style="width:98%;background:linear-gradient(90deg,var(--b),var(--a));"></div></div>
-        <div style="font-size:12px;color:var(--muted);">Zero policy discrepancies in Q4</div>
+        <span class="comp-tag s-tag">Reports</span>
+        <div class="sent-score" style="color:var(--b);">02</div>
+        <div style="font-size:13px;color:var(--text);font-weight:600;">HR/Admin can review submitted reports</div>
+        <div class="sent-bar-bg"><div class="sent-bar-fill" style="width:76%;background:linear-gradient(90deg,var(--b),var(--a));"></div></div>
+        <div style="font-size:12px;color:var(--muted);">Employees see their own identified reports.</div>
       </div>
 
-      <div class="sentiment-card glass tilt" data-cur="DEPT">
+      <div class="sentiment-card glass tilt" data-cur="FEATURE">
         <div class="gl"></div>
-        <span class="comp-tag s-tag">Product &amp; Design</span>
-        <div class="sent-score" style="color:var(--c);">93%</div>
-        <div style="font-size:13px;color:var(--text);font-weight:600;">Inclusive Collaboration &middot; 312 signals</div>
-        <div class="sent-bar-bg"><div class="sent-bar-fill" style="width:93%;background:linear-gradient(90deg,var(--c),var(--a));"></div></div>
-        <div style="font-size:12px;color:var(--muted);">100% accessible sprint design reviews</div>
+        <span class="comp-tag s-tag">Knowledge</span>
+        <div class="sent-score" style="color:var(--c);">03</div>
+        <div style="font-size:13px;color:var(--text);font-weight:600;">Search company-scoped documents</div>
+        <div class="sent-bar-bg"><div class="sent-bar-fill" style="width:84%;background:linear-gradient(90deg,var(--c),var(--a));"></div></div>
+        <div style="font-size:12px;color:var(--muted);">Uploads are limited to HR/Admin roles.</div>
       </div>
 
-      <div class="sentiment-card glass tilt" data-cur="DEPT">
+      <div class="sentiment-card glass tilt" data-cur="FEATURE">
         <div class="gl"></div>
-        <span class="comp-tag s-tag">Operations &amp; Facilities</span>
-        <div class="sent-score" style="color:var(--amber);">91%</div>
-        <div style="font-size:13px;color:var(--text);font-weight:600;">Barrier Resolution &middot; 256 signals</div>
-        <div class="sent-bar-bg"><div class="sent-bar-fill" style="width:91%;background:linear-gradient(90deg,var(--amber),var(--teal));"></div></div>
-        <div style="font-size:12px;color:var(--muted);">Average accommodation closed in 2.1 days</div>
+        <span class="comp-tag s-tag">Guardrail</span>
+        <div class="sent-score" style="color:var(--amber);">04</div>
+        <div style="font-size:13px;color:var(--text);font-weight:600;">No individual attrition prediction</div>
+        <div class="sent-bar-bg"><div class="sent-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--amber),var(--teal));"></div></div>
+        <div style="font-size:12px;color:var(--muted);">Analytics are not an employment decision tool.</div>
       </div>
     </div>
   </section>
@@ -1200,9 +1192,9 @@ const docBatch = await ragService.indexDocument({
   <!-- 08 PRIVACY, SECURITY & TRUST CENTER                                        -->
   <!-- ========================================================================= -->
   <section id="trust">
-    <div class="eyebrow">// enterprise security</div>
+    <div class="eyebrow">// security boundaries</div>
     <h2>Privacy, Security &amp; Trust Center</h2>
-    <p class="sec-sub">Built from the ground up for strict enterprise isolation, anonymity, and compliance.</p>
+    <p class="sec-sub">Controls implemented in this prototype—and important limitations to understand before using it.</p>
 
     <div class="trust-grid">
       <div class="trust-card glass tilt" data-cur="SECURITY">
@@ -1210,9 +1202,9 @@ const docBatch = await ragService.indexDocument({
         <div class="trust-icon">🛡️</div>
         <h3 style="font:700 18px Unbounded;margin-bottom:8px;">Anonymous Report Submission</h3>
         <p style="font-size:14px;color:var(--muted);line-height:1.55;">
-          Anonymous submissions omit the submitter account ID. This prototype does not guarantee anonymity if a report contains identifying details.
+          Anonymous submissions omit the submitter account ID. Report text is not automatically scrubbed and may identify its author.
         </p>
-        <span class="trust-badge">Submitter account ID omitted</span>
+        <span class="trust-badge">Text can still identify the author</span>
       </div>
 
       <div class="trust-card glass tilt" data-cur="SECURITY">
@@ -1220,29 +1212,29 @@ const docBatch = await ragService.indexDocument({
         <div class="trust-icon">🔒</div>
         <h3 style="font:700 18px Unbounded;margin-bottom:8px;">Prototype Security Controls</h3>
         <p style="font-size:14px;color:var(--muted);line-height:1.55;">
-          The application uses JWT sessions, role checks, and company-scoped queries. It has not been independently certified or assessed for regulatory compliance.
+          Sensitive APIs require authentication and role checks. This prototype has not been independently security-audited or certified.
         </p>
-        <span class="trust-badge">Not a compliance certification</span>
+        <span class="trust-badge">Prototype controls, not certification</span>
       </div>
 
       <div class="trust-card glass tilt" data-cur="SECURITY">
         <div class="gl"></div>
         <div class="trust-icon">🚫</div>
-        <h3 style="font:700 18px Unbounded;margin-bottom:8px;">Zero Model Training</h3>
+        <h3 style="font:700 18px Unbounded;margin-bottom:8px;">AI Provider Configuration</h3>
         <p style="font-size:14px;color:var(--muted);line-height:1.55;">
-          Your proprietary company handbooks, policy memos, and employee conversations are never used to train public foundational AI models.
+          An external provider may receive content when configured. Review its terms and privacy practices before sending sensitive information.
         </p>
-        <span class="trust-badge">100% Private Enterprise RAG</span>
+        <span class="trust-badge">Provider behavior depends on configuration</span>
       </div>
 
       <div class="trust-card glass tilt" data-cur="SECURITY">
         <div class="gl"></div>
         <div class="trust-icon">📜</div>
-        <h3 style="font:700 18px Unbounded;margin-bottom:8px;">Immutable Audit Trails</h3>
+        <h3 style="font:700 18px Unbounded;margin-bottom:8px;">Local Prototype Storage</h3>
         <p style="font-size:14px;color:var(--muted);line-height:1.55;">
-          Complete cryptographic audit logging for compliance, governance, and ethical accountability with CSV and JSON verification exports.
+          Application records are stored in local JSON files by default. This is not a managed production database or a backup strategy.
         </p>
-        <span class="trust-badge">Verifiable Compliance Logs</span>
+        <span class="trust-badge">Not designed for sensitive production data</span>
       </div>
     </div>
   </section>
@@ -1252,8 +1244,8 @@ const docBatch = await ragService.indexDocument({
   <!-- ========================================================================= -->
   <section id="accessibility">
     <div class="eyebrow">// universal access</div>
-    <h2>Universal Accessibility &amp; WCAG 2.2 AAA</h2>
-    <p class="sec-sub">Test our built-in assistive technologies live right now using the controls below.</p>
+    <h2>Accessibility Controls</h2>
+    <p class="sec-sub">Try the available contrast, focus, font, and motion controls. These experimental controls are not a claim of WCAG conformance.</p>
 
     <div class="glass a11y-box">
       <div class="a11y-toggles">
@@ -1276,60 +1268,42 @@ const docBatch = await ragService.indexDocument({
       </div>
 
       <div style="padding:22px;border-radius:18px;background:rgba(0,0,0,0.4);border:1px solid var(--line);font-size:14px;line-height:1.65;color:var(--text);">
-        <strong>Accessibility Compliance Statement:</strong> INCLUAI adheres strictly to W3C WCAG 2.2 Level AAA standards, including full keyboard navigability (no mouse required), ARIA screen-reader landmark hierarchies, color-blindness certified contrasting ratios (&gt; 7:1), and semantic HTML layout trees.
+        <strong>Accessibility note:</strong> Some accessibility-oriented controls are included for demonstration. The application has not been independently audited for WCAG conformance; report barriers or use your browser's accessibility settings where needed.
       </div>
     </div>
   </section>
 
   <!-- ========================================================================= -->
-  <!-- 10 EMPLOYEE STORIES AND TESTIMONIALS                                       -->
+  <!-- 10 SWOC DEMO WALKTHROUGH                                                   -->
   <!-- ========================================================================= -->
-  <section id="testimonials">
-    <div class="eyebrow">// authentic voices</div>
-    <h2>Employee Stories &amp; Testimonials</h2>
-    <p class="sec-sub">What leaders, developers, and people ethics advocates say about INCLUAI.</p>
+  <section id="walkthrough">
+    <div class="eyebrow">// 60-second demo walkthrough</div>
+    <h2>Show the Product in Three Steps</h2>
+    <p class="sec-sub">A concise presentation flow that demonstrates real prototype behavior without implying customer results.</p>
 
     <div class="stories-grid">
       <div class="story-card glass tilt" data-cur="STORY">
         <div class="gl"></div>
-        <div class="story-quote">
-          "Before INCLUAI, getting an accommodation for neurodiversity felt like an interrogation. With INCLUAI, my ergonomic and focus equipment was verified and approved in under 48 hours without awkward conversations."
-        </div>
-        <div class="story-author">
-          <div class="story-avatar">MP</div>
-          <div>
-            <div style="font:700 15px Unbounded;">Maya Patel</div>
-            <div style="font-size:12.5px;color:var(--b);">Senior Systems Architect &middot; Engineering</div>
-          </div>
-        </div>
+        <span class="comp-tag s-tag">Step 01 · Employee</span>
+        <h3 style="font:700 18px Unbounded;margin:18px 0 10px;">Ask a policy question</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;">Try the policy assistant, inspect the cited document, and note that AI output needs human verification.</p>
+        <a class="btn" href="#copilot-demo" style="margin-top:20px;">Try the assistant ↗</a>
       </div>
 
       <div class="story-card glass tilt" data-cur="STORY">
         <div class="gl"></div>
-        <div class="story-quote">
-          "The zero-retaliation reporting actually works. Our team was able to flag micro-aggressions and scheduling barriers confidentially, and leadership resolved them before anyone felt the need to resign."
-        </div>
-        <div class="story-author">
-          <div class="story-avatar" style="background:linear-gradient(135deg,var(--teal),var(--b));">SC</div>
-          <div>
-            <div style="font:700 15px Unbounded;">Sarah Connor</div>
-            <div style="font-size:12.5px;color:var(--teal);">Workplace Experience Lead &middot; People Ops</div>
-          </div>
-        </div>
+        <span class="comp-tag s-tag">Step 02 · Employee</span>
+        <h3 style="font:700 18px Unbounded;margin:18px 0 10px;">Submit a workplace report</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;">Show the anonymous option and explain its boundary: report text can still contain identifying details.</p>
+        <a class="btn" href="/app">Explore the workplace app ↗</a>
       </div>
 
       <div class="story-card glass tilt" data-cur="STORY">
         <div class="gl"></div>
-        <div class="story-quote">
-          "The Grounded AI Copilot eliminated 80% of routine HR questions in our first month. The best part? It never hallucinates answers because it strictly cites our actual handbook."
-        </div>
-        <div class="story-author">
-          <div class="story-avatar" style="background:linear-gradient(135deg,var(--c),var(--amber));">DV</div>
-          <div>
-            <div style="font:700 15px Unbounded;">David Vance</div>
-            <div style="font-size:12.5px;color:var(--c);">Chief Inclusion Officer &middot; Enterprise</div>
-          </div>
-        </div>
+        <span class="comp-tag s-tag">Step 03 · HR/Admin</span>
+        <h3 style="font:700 18px Unbounded;margin:18px 0 10px;">Review role-based controls</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;">Show that protected dataset and report views require authorized access; use only demo accounts and data.</p>
+        <a class="btn" href="/dataset.html">Open dataset explorer ↗</a>
       </div>
     </div>
   </section>
@@ -1346,60 +1320,60 @@ const docBatch = await ragService.indexDocument({
       <div class="roadmap-card glass tilt" data-cur="ROADMAP">
         <div class="gl"></div>
         <div>
-          <div class="road-q">Q1 2026 &middot; COMPLETED</div>
-          <span class="road-status live">Shipped ✦</span>
+          <div class="road-q">CURRENT CAPABILITY</div>
+          <span class="road-status live">Available in demo</span>
           <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Policy Document Search</h3>
           <p style="font-size:13.5px;color:var(--muted);line-height:1.5;">
             Search configured policy documents and review any citations against the source. AI responses can be inaccurate.
           </p>
         </div>
         <button class="vote-btn" onclick="voteRoadmap('feat_rag')" id="vote_feat_rag">
-          <span>👍 Voted (482)</span>
+          <span>Vote for this idea</span>
         </button>
       </div>
 
       <div class="roadmap-card glass tilt" data-cur="ROADMAP">
         <div class="gl"></div>
         <div>
-          <div class="road-q">Q2 2026 &middot; NOW LIVE</div>
-          <span class="road-status live">Now Live ✦</span>
+          <div class="road-q">CURRENT CAPABILITY</div>
+          <span class="road-status live">Available in demo</span>
           <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Dataset Engine &amp; Copilot 2.0</h3>
           <p style="font-size:13.5px;color:var(--muted);line-height:1.5;">
-            4,653+ verified records analytics, dynamic AI suggestions, multi-language support, and 2.4-day SLA routing.
+            Explore protected dataset access and analytics. Individual attrition scoring is disabled; the platform is not an employment decision tool.
           </p>
         </div>
         <button class="vote-btn" onclick="voteRoadmap('feat_dataset')" id="vote_feat_dataset">
-          <span>👍 Voted (619)</span>
+          <span>Vote for this idea</span>
         </button>
       </div>
 
       <div class="roadmap-card glass tilt" data-cur="ROADMAP">
         <div class="gl"></div>
         <div>
-          <div class="road-q">Q3 2026 &middot; IN BETA</div>
-          <span class="road-status beta">In Beta</span>
+          <div class="road-q">FUTURE IDEA</div>
+          <span class="road-status beta">Not implemented</span>
           <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Autonomous Accommodation Swarm</h3>
           <p style="font-size:13.5px;color:var(--muted);line-height:1.5;">
             Cross-tool dispatch into Slack, Microsoft Teams, and Jira with automated budget pre-approvals for ergonomics.
           </p>
         </div>
         <button class="vote-btn" onclick="voteRoadmap('feat_swarm')" id="vote_feat_swarm">
-          <span>🗳️ Vote Feature (<span id="count_feat_swarm">289</span>)</span>
+          <span>Vote for this idea</span>
         </button>
       </div>
 
       <div class="roadmap-card glass tilt" data-cur="ROADMAP">
         <div class="gl"></div>
         <div>
-          <div class="road-q">Q4 2026 &middot; UPCOMING</div>
-          <span class="road-status next">Upcoming</span>
+          <div class="road-q">FUTURE IDEA</div>
+          <span class="road-status next">Not implemented</span>
           <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Real-Time Meeting Voice Copilot</h3>
           <p style="font-size:13.5px;color:var(--muted);line-height:1.5;">
             Multimodal live audio captioning, interruption equalization detection, and automated neurodiversity summaries.
           </p>
         </div>
         <button class="vote-btn" onclick="voteRoadmap('feat_voice')" id="vote_feat_voice">
-          <span>🗳️ Vote Feature (<span id="count_feat_voice">342</span>)</span>
+          <span>Vote for this idea</span>
         </button>
       </div>
     </div>
@@ -1424,7 +1398,7 @@ const docBatch = await ragService.indexDocument({
   <section id="faq">
     <div class="eyebrow">// questions &amp; answers</div>
     <h2>Frequently Asked Questions</h2>
-    <p class="sec-sub">Everything you need to know about INCLUAI intelligence, security, and enterprise onboarding.</p>
+    <p class="sec-sub">What the current prototype does, how it handles demo data, and where its limits are.</p>
 
     <div class="faq-box">
       <div class="faq-item glass open" onclick="toggleFaq(this)">
@@ -1453,7 +1427,7 @@ const docBatch = await ragService.indexDocument({
           <i>+</i>
         </div>
         <div class="faq-a">
-          Yes! INCLUAI provides REST APIs and webhook dispatchers that connect directly to enterprise communication hubs and HRIS platforms. Employees can interact with the Copilot or track accommodations without leaving their daily workflow.
+          Not yet. The current prototype does not include Slack, Teams, Workday, or other external workplace integrations.
         </div>
       </div>
 
@@ -1469,11 +1443,11 @@ const docBatch = await ragService.indexDocument({
 
       <div class="faq-item glass" onclick="toggleFaq(this)">
         <div class="faq-q">
-          <span>How is the 2.4-day accommodation SLA tracked and enforced?</span>
+          <span>Does the app guarantee response or resolution times?</span>
           <i>+</i>
         </div>
         <div class="faq-a">
-          When an accommodation is requested, the system automatically creates a tracked task assigned to facilities and HR with automated SLA alerts at 24h, 48h, and 72h. Our automated telemetry dashboard alerts leadership if any barrier request risks breach.
+          No. Tasks can be created and their status updated, but this prototype does not enforce service-level agreements or guarantee outcomes.
         </div>
       </div>
 
@@ -1483,65 +1457,33 @@ const docBatch = await ragService.indexDocument({
           <i>+</i>
         </div>
         <div class="faq-a">
-          Most organizations are fully operational within 24 to 48 hours. Our ingestion pipeline parses and indexes PDF manuals, Notion spaces, and Google Docs automatically with immediate vector verification.
+          This prototype supports manual document upload for the formats documented in the repository. It does not automatically connect to Notion, Google Drive, or HR systems.
         </div>
       </div>
     </div>
   </section>
 
   <!-- ========================================================================= -->
-  <!-- 14 JOIN / WAITLIST & INSTANT VIP TOKEN                                    -->
+  <!-- 14 PROJECT UPDATES WAITLIST                                               -->
   <!-- ========================================================================= -->
   <section id="join">
     <div class="eyebrow">// the collective drop</div>
     <h2>Save Your Spot In INCLUAI 2.0</h2>
-    <p class="sec-sub">Join the early VIP access tier. Generates your cryptographic session token immediately.</p>
+    <p class="sec-sub">Register interest in project updates. This form does not create an account or grant access to the workplace app.</p>
 
     <div class="glass join-card">
       <div class="gl"></div>
       <form id="vibeForm" autocomplete="off">
         <div class="field">
-          <label class="lbl" for="vName">What do people call you</label>
-          <input class="join-input" id="vName" placeholder="e.g. Maya" required>
+          <label class="lbl" for="vEmail">Email address for project updates</label>
+          <input class="join-input" id="vEmail" type="email" placeholder="you@example.com" required>
         </div>
-
-        <div class="field">
-          <label class="lbl" for="vEmail">Workplace or personal email</label>
-          <input class="join-input" id="vEmail" type="email" placeholder="you@company.com" required>
-        </div>
-
-        <div class="field">
-          <span class="lbl">Current Workplace Mood</span>
-          <div class="chips">
-            <input type="radio" name="mood" id="m1" value="running on iced coffee" checked>
-            <label for="m1" data-cur="CHOOSE">running on iced coffee</label>
-
-            <input type="radio" name="mood" id="m2" value="ready to collaborate">
-            <label for="m2" data-cur="CHOOSE">ready to collaborate</label>
-
-            <input type="radio" name="mood" id="m3" value="need to touch grass">
-            <label for="m3" data-cur="CHOOSE">need to touch grass</label>
-
-            <input type="radio" name="mood" id="m4" value="focused &amp; thriving">
-            <label for="m4" data-cur="CHOOSE">focused &amp; thriving</label>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="lbl" for="vHype">How hopeful are you today</label>
-          <div class="range-row">
-            <input type="range" id="vHype" min="0" max="100" value="85">
-            <div class="range-val" id="hypeVal">85%</div>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="lbl" for="vMsg">What's on your mind (Confidential)</label>
-          <textarea class="join-input" id="vMsg" placeholder="Share what inclusive workplace tools you need most..."></textarea>
-        </div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:16px;">
+          Demo notice: your email is stored by this app for the project updates list. Use an address you control, not a workplace email.
+        </p>
 
         <button class="btn p" id="vSubmitBtn" type="submit" data-mag data-cur="GO" style="width:100%;justify-content:center;padding:16px;">
-          <span id="vSubmitLabel">Reserve Spot &amp; Get VIP Token →</span>
+          <span id="vSubmitLabel">Register Interest →</span>
         </button>
       </form>
 
@@ -1551,19 +1493,19 @@ const docBatch = await ragService.indexDocument({
           Spot Reserved! ✦
         </div>
         <p style="font-size:0.92rem;color:var(--text);margin-bottom:16px;" id="vipSuccessDesc">
-          Your cryptographic session token is active. Step inside the Workplace Platform.
+          Your interest has been recorded. This reservation is separate from workplace app accounts.
         </p>
         <a href="/app#home" class="btn p" style="font-size:0.95rem;padding:12px 28px;text-decoration:none;">
-          <span>Enter Workplace Platform 2.0 (VIP Token Active) ↗</span>
+          <span>Explore the Workplace App ↗</span>
         </a>
       </div>
     </div>
 
     <!-- Live Telemetry Ticker -->
     <div class="telemetry-ticker" id="telemetryTicker">
-      <span>Live Early Members: <b id="statCount">248+</b></span>
+      <span>Project update reservations: <b id="statCount">0</b></span>
       <span>&bull;</span>
-      <span>Collective Hype: <b id="statHype">84%</b></span>
+      <span>Prototype showcase</span>
       <span>&bull;</span>
       <a href="/api/v2/observability/metrics" target="_blank" style="color:var(--b);text-decoration:none">Telemetry API ↗</a>
     </div>
@@ -1577,11 +1519,11 @@ const docBatch = await ragService.indexDocument({
       <div class="footer-brand">
         <h4>INCLUAI 2.0</h4>
         <p>
-          A workplace-support prototype with policy search, anonymous report submission, task tracking, and accessibility-focused tools.
+          A student project prototype for role-based workplace policy search, reporting, task tracking, and analytics.
         </p>
         <div class="status-indicator">
           <span></span>
-          All Systems Operational &middot; 99.98% SLA
+          Prototype · not an SLA-backed service
         </div>
       </div>
 
@@ -1589,7 +1531,7 @@ const docBatch = await ragService.indexDocument({
         <h5>Product</h5>
         <ul>
           <li><a href="/app">Workplace App ↗</a></li>
-          <li><a href="/dataset.html" target="_blank">Dataset Engine (4,653) ↗</a></li>
+          <li><a href="/dataset.html" target="_blank">Protected Dataset Explorer ↗</a></li>
           <li><a href="#copilot-demo">AI Copilot Demo</a></li>
           <li><a href="#how-it-works">Neural Pipeline</a></li>
           <li><a href="#roadmap">Product Roadmap</a></li>
@@ -1602,8 +1544,8 @@ const docBatch = await ragService.indexDocument({
           <li><a href="#problem-solution">Enterprise Inclusion</a></li>
           <li><a href="#sentiment">Sentiment Telemetry</a></li>
           <li><a href="#trust">Psychological Safety</a></li>
-          <li><a href="#accessibility">WCAG 2.2 AAA</a></li>
-          <li><a href="#impact">Resolution SLA</a></li>
+          <li><a href="#accessibility">Accessibility controls</a></li>
+          <li><a href="#impact">Demo walkthrough</a></li>
         </ul>
       </div>
 
@@ -1621,17 +1563,17 @@ const docBatch = await ragService.indexDocument({
       <div class="footer-col">
         <h5>Company</h5>
         <ul>
-          <li><a href="#testimonials">Our People</a></li>
+          <li><a href="#walkthrough">Demo walkthrough</a></li>
           <li><a href="#moments">Relatable Moments</a></li>
-          <li><a href="#join">VIP Waitlist</a></li>
-          <li><a href="/api/v2/dataset/export?format=csv">Open Data CSV</a></li>
+          <li><a href="#join">Project updates</a></li>
+          <li><a href="/dataset.html">Protected dataset</a></li>
           <li><a href="#home">Back To Top ↑</a></li>
         </ul>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <div>&copy; 2026 INCLUAI Technologies Inc. All rights reserved. Real Feels, Zero Filter.</div>
+      <div>INCLUAI · student project prototype · 2026</div>
       <div style="display:flex;gap:20px;">
         <a href="/app" style="color:var(--b);text-decoration:none;">Workplace Platform 2.0</a>
         <a href="/dataset.html" target="_blank" style="color:var(--teal);text-decoration:none;">Dataset Explorer</a>

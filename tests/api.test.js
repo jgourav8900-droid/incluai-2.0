@@ -200,41 +200,49 @@ async function runTests() {
     assert(settingsRes.status === 200 && settingsRes.body.preferences.emailNotifications === true, 'Settings preferences saved successfully');
 
     // 13. Waitlist Reservation & JWT Token Issuance
+    const waitlistEmail = `early_${Date.now()}@realfeels.internal`;
     const waitlistRes = await request('POST', '/api/v2/waitlist', {
       name: 'Taylor Swift',
-      email: `early_${Date.now()}@realfeels.internal`,
+      email: waitlistEmail,
       mood: 'soft but unbothered',
       hype: 92,
       msg: 'Need this space desperately'
     });
+    const savedWaitlist = db.findOne('waitlist', member => member.email === waitlistEmail);
     assert(
-      waitlistRes.status === 201 &&
+      waitlistRes.status === 202 &&
       !waitlistRes.body.token &&
-      waitlistRes.body.member.spotNumber >= 249,
-      'Waitlist signup saves an early-access reservation without issuing a workplace token'
+      !waitlistRes.body.member &&
+      waitlistRes.body.message.includes('recorded') &&
+      savedWaitlist && !savedWaitlist.name && !savedWaitlist.mood && !savedWaitlist.hype && !savedWaitlist.msg,
+      'Waitlist signup stores only the email and does not issue a workplace token'
     );
 
     // 14. Waitlist Public Stats Telemetry
     const statsRes = await request('GET', '/api/v2/waitlist/stats');
     assert(
-      statsRes.status === 200 && 
-      statsRes.body.totalCount >= 249 && 
-      statsRes.body.averageHype > 0,
-      'Waitlist public stats endpoint returns live collective vibe telemetry'
+      statsRes.status === 200 &&
+      statsRes.body.totalCount === 1 &&
+      !('recent' in statsRes.body) &&
+      !('averageHype' in statsRes.body),
+      'Waitlist public stats return only the real reservation count'
     );
 
     // 15. Waitlist Duplicate Email Handling
     const duplicateWaitlistRes = await request('POST', '/api/v2/waitlist', {
       name: 'Taylor Swift',
-      email: waitlistRes.body.member.email,
+      email: waitlistEmail,
       mood: 'soft but unbothered',
       hype: 95
     });
     assert(
-      duplicateWaitlistRes.status === 200 && 
-      duplicateWaitlistRes.body.alreadyRegistered === true && 
-      !duplicateWaitlistRes.body.token,
-      'Waitlist duplicate lookup does not disclose a stored access token'
+      duplicateWaitlistRes.status === 202 &&
+      duplicateWaitlistRes.body.message === waitlistRes.body.message &&
+      !duplicateWaitlistRes.body.token &&
+      !duplicateWaitlistRes.body.member &&
+      !duplicateWaitlistRes.body.email &&
+      !duplicateWaitlistRes.body.name,
+      'Waitlist duplicate lookup does not disclose stored identity data or an access token'
     );
 
     // 16. WebGL Cinematic UI Landing Page Route
@@ -245,6 +253,12 @@ async function runTests() {
       indexRes.body.includes('id="gl"') && 
       indexRes.body.includes('id="lens"'),
       'Landing page serves Three.js WebGL canvas and cinematic Lens Reveal UI'
+    );
+    const publicDatasetFileRes = await request('GET', '/data/employee_attrition.json');
+    const publicDatasetCsvRes = await request('GET', '/data/employee_attrition.csv');
+    assert(
+      publicDatasetFileRes.status === 404 && publicDatasetCsvRes.status === 404,
+      'Static server does not expose the dataset files anonymously'
     );
 
     // 17. Workplace App Route Resolution

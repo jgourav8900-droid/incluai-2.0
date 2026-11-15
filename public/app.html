@@ -1317,7 +1317,18 @@
     }
     .toast.show { transform: translate(-50%, 0); }
 
+    @media (max-width: 1200px) {
+      .top-header { padding: 10px 18px; gap: 14px; }
+      .header-nav { gap: 12px; }
+      #publicAuthActions { gap: 8px; }
+      #publicAuthActions #publicThemeSelect,
+      #publicAuthActions #publicLangSelect { display: none; }
+    }
+
     @media (max-width: 860px) {
+      #publicNav { display: none; }
+      .top-header { padding: 10px 14px; }
+      .brand-name { display: none; }
       .charts-row { grid-template-columns: 1fr; }
       .sidebar { width: 68px; }
       .sidebar .menu-label, .sidebar-section-title, .user-name-tag { display: none; }
@@ -1352,12 +1363,8 @@
       <!-- Public Nav (before login) -->
       <nav class="header-nav" id="publicNav">
         <a href="/" class="nav-link" style="color:var(--amber-light); font-weight: 500;">✦ Real Feels</a>
-        <a href="/dataset.html" target="_blank" class="nav-link" style="color:var(--teal); font-weight: 600;">🗃️ Dataset (4,653) ↗</a>
-        <a href="#landing" class="nav-link" onclick="navigateTo('landing')">Overview</a>
         <a href="#features" class="nav-link" onclick="scrollToSection('features')">Features</a>
-        <a href="#how-it-works" class="nav-link" onclick="scrollToSection('how-it-works')">How It Works</a>
         <a href="#security" class="nav-link" onclick="scrollToSection('security')">Privacy & Security</a>
-        <a href="#team" class="nav-link" onclick="scrollToSection('team')">Our People</a>
       </nav>
 
       <!-- Public Actions -->
@@ -1386,7 +1393,7 @@
       <div class="header-actions" id="authActions" style="display: none;">
         <a href="/dataset.html" target="_blank" class="btn btn-outline btn-sm"
           style="color:var(--teal); border-color:rgba(25,240,196,0.35); text-decoration:none;">
-          <span>🗃️</span> Dataset Engine (4,653) ↗
+          <span>🗃️</span> Dataset Explorer ↗
         </a>
 
         <!-- Global Theme Selector -->
@@ -1456,7 +1463,7 @@
           Make Every Workplace More <span class="hero-amber">Inclusive, Intelligent,</span> and Connected.
         </h1>
         <p class="hero-desc">
-          An inclusive AI platform built by people, for everyone. Real-time AI employee assistance, strictly verified company knowledge, accessibility barrier resolution, and actionable intelligence. Move your cursor through the 3D space and touch the orbs to light up the workplace network.
+          A workplace support prototype with policy search, AI assistance, reporting, task tracking, and analytics. AI responses can be inaccurate; verify important answers against source documents.
         </p>
         <div class="hero-cta">
           <button class="btn btn-primary" onclick="navigateTo('signup')" style="padding: 12px 26px; font-size: 15px;">
@@ -1480,8 +1487,7 @@
           <div class="feature-icon">🤖</div>
           <h2 class="feature-title">AI Workplace Assistant</h2>
           <p class="feature-desc">
-            Find policy answers and get assistance with workplace communication. Answers are strictly grounded in
-            verified company documents with verifiable citations.
+            Search configured policy documents and review any citations. Responses may be incomplete or incorrect.
           </p>
         </div>
 
@@ -1489,8 +1495,7 @@
           <div class="feature-icon">🛡️</div>
           <h2 class="feature-title">Inclusion & Accessibility</h2>
           <p class="feature-desc">
-            Submit and manage workplace concerns securely. Built-in server-side anonymity protection ensures
-            accessibility barriers and feedback are resolved without friction.
+            Submit workplace concerns with an anonymous option. The option omits the submitter account ID, but report text may still identify its author.
           </p>
         </div>
 
@@ -1498,8 +1503,7 @@
           <div class="feature-icon">📈</div>
           <h2 class="feature-title">Workplace Intelligence</h2>
           <p class="feature-desc">
-            Explore trends, metrics, and evidence-based recommendations. Dynamically identify unresolved accessibility
-            bottlenecks and workload distribution across departments.
+            Explore dashboard metrics and prototype recommendations. Analytics are for human review and not employment decisions.
           </p>
         </div>
 
@@ -1507,8 +1511,7 @@
           <div class="feature-icon">📚</div>
           <h2 class="feature-title">Knowledge & Productivity</h2>
           <p class="feature-desc">
-            Search company documents, manage tasks, and simplify daily work. Centralized document management eliminates
-            employee confusion over handbooks and entitlements.
+            Search uploaded company documents and manage tasks. External repository integrations are not included.
           </p>
         </div>
       </div>
@@ -1522,23 +1525,20 @@
           <div>
             <div style="font-family:'JetBrains Mono'; color:var(--amber-light); font-size:12px; margin-bottom:6px;">STEP
               01</div>
-            <div style="font-weight:600; font-size:15px; margin-bottom:4px;">Unified Knowledge Ingestion</div>
-            <p style="font-size:13px; color:var(--text-muted);">Approved HR handbooks, leave policies, and remote
-              guidelines are indexed with vector embeddings.</p>
+            <div style="font-weight:600; font-size:15px; margin-bottom:4px;">Upload Policy Documents</div>
+            <p style="font-size:13px; color:var(--text-muted);">Authorized HR/Admin users can upload supported documents for search.</p>
           </div>
           <div>
             <div style="font-family:'JetBrains Mono'; color:var(--amber-light); font-size:12px; margin-bottom:6px;">STEP
               02</div>
-            <div style="font-weight:600; font-size:15px; margin-bottom:4px;">Grounded Assistance & Tools</div>
-            <p style="font-size:13px; color:var(--text-muted);">Employees query policies via Copilot, rewrite messages
-              respectfully, and draft official emails with citations.</p>
+            <div style="font-weight:600; font-size:15px; margin-bottom:4px;">Policy Search & AI Assistance</div>
+            <p style="font-size:13px; color:var(--text-muted);">Employees can search available policies and ask questions; check answers against the cited source.</p>
           </div>
           <div>
             <div style="font-family:'JetBrains Mono'; color:var(--amber-light); font-size:12px; margin-bottom:6px;">STEP
               03</div>
-            <div style="font-weight:600; font-size:15px; margin-bottom:4px;">Confidential Feedback & Action</div>
-            <p style="font-size:13px; color:var(--text-muted);">Physical or digital barriers are submitted with
-              guaranteed anonymity, generating AI recommendations for HR.</p>
+            <div style="font-weight:600; font-size:15px; margin-bottom:4px;">Report & Task Workflows</div>
+            <p style="font-size:13px; color:var(--text-muted);">Anonymous submissions omit the submitter account ID; report text is not automatically scrubbed.</p>
           </div>
         </div>
       </div>
@@ -1546,26 +1546,21 @@
       <!-- Privacy & Access Controls Section -->
       <div id="security"
         style="max-width: 1050px; margin: 24px auto 48px; padding: 28px 24px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
-        <h2 style="font-size: 19px; font-weight: 600; margin-bottom: 12px; text-align: center;">Privacy, Anonymity &
-          Multi-Tenant Security</h2>
+        <h2 style="font-size: 19px; font-weight: 600; margin-bottom: 12px; text-align: center;">Prototype Access & Privacy Boundaries</h2>
         <p
           style="font-size: 13.5px; color: var(--text-muted); text-align: center; max-width: 720px; margin: 0 auto 20px;">
-          Workplace reports handle sensitive employee information. INCLUAI enforces strict server-side safeguards.
+          Do not use this prototype with sensitive real-world employee information. It has not been independently security-audited or certified.
         </p>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
           <div
             style="background:rgba(255,255,255,0.02); padding:14px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-            <div style="font-weight:600; font-size:14px; margin-bottom:4px; color:var(--accent-green);">✓ True
-              Server-Side Anonymity</div>
-            <div style="font-size:12.5px; color:var(--text-muted);">When Anonymous is selected, the server removes user
-              ID, employee badge, IP, and tokens before persistence.</div>
+            <div style="font-weight:600; font-size:14px; margin-bottom:4px; color:var(--accent-green);">Anonymous Report Option</div>
+            <div style="font-size:12.5px; color:var(--text-muted);">The submitter account ID is omitted. Free-text content may still reveal identity.</div>
           </div>
           <div
             style="background:rgba(255,255,255,0.02); padding:14px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-            <div style="font-weight:600; font-size:14px; margin-bottom:4px; color:var(--accent-blue);">✓ Role-Based
-              Access Control (RBAC)</div>
-            <div style="font-size:12.5px; color:var(--text-muted);">Employees only see their own submitted reports. Only
-              authorized HR administrators can review and resolve concerns.</div>
+            <div style="font-weight:600; font-size:14px; margin-bottom:4px; color:var(--accent-blue);">Role-Based Access</div>
+            <div style="font-size:12.5px; color:var(--text-muted);">Protected API routes require authentication and role checks. This is a prototype control, not a compliance certification.</div>
           </div>
         </div>
       </div>
@@ -1741,7 +1736,7 @@
           <div class="menu-item" id="menu-dataset" onclick="navigateTo('dataset')">
             <span class="menu-icon">🗃️</span>
             <span class="menu-label">Employee Dataset</span>
-            <span style="margin-left: auto; font-size: 10px; font-family:'JetBrains Mono'; background:rgba(25,240,196,0.15); color:var(--teal); padding:2px 6px; border-radius:4px;">4,653</span>
+            <span style="margin-left: auto; font-size: 10px; font-family:'JetBrains Mono'; background:rgba(25,240,196,0.15); color:var(--teal); padding:2px 6px; border-radius:4px;">HR/Admin</span>
           </div>
 
           <div class="menu-item" id="menu-analytics" onclick="navigateTo('analytics')">
@@ -1819,7 +1814,7 @@
           <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px;">
             <button class="btn btn-outline" onclick="navigateTo('dashboard')" data-cur="VIEW" style="border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid var(--line);">📊 Dashboard</button>
             <button class="btn btn-outline" onclick="navigateTo('dataset')" data-cur="DATA" style="border-radius:999px; border-color:rgba(25,240,196,0.35); color:var(--teal); background:rgba(25,240,196,0.06);">🗃️ Employee Dataset</button>
-            <a href="/dataset.html" target="_blank" class="btn btn-primary" data-cur="DATA" style="background:linear-gradient(120deg, var(--teal), var(--b)); color:#000; font-weight:700; text-decoration:none; border-radius:999px; padding:10px 22px; box-shadow:0 0 25px rgba(25,240,196,0.3);">Explore Dataset (4,653) ↗</a>
+            <a href="/dataset.html" target="_blank" class="btn btn-primary" data-cur="DATA" style="background:linear-gradient(120deg, var(--teal), var(--b)); color:#000; font-weight:700; text-decoration:none; border-radius:999px; padding:10px 22px; box-shadow:0 0 25px rgba(25,240,196,0.3);">Explore Dataset ↗</a>
             <button class="btn btn-outline" onclick="navigateTo('copilot')" data-cur="COPILOT" style="border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid var(--line);">🤖 Ask Copilot</button>
             <button class="btn btn-outline" onclick="navigateTo('reports')" data-cur="REPORT" style="border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid var(--line);">🛡️ Inclusion Hub</button>
             <button class="btn btn-outline" onclick="navigateTo('tasks')" data-cur="TASK" style="border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid var(--line);">✅ My Tasks</button>
@@ -1844,16 +1839,16 @@
             </div>
             <div class="metric-card">
               <span class="metric-title">Resolution Speed</span>
-              <span class="metric-value" style="color:var(--accent-green);">2.4 Days</span>
-              <span class="metric-sub">Average accommodation SLA</span>
+              <span class="metric-value" style="color:var(--accent-green);">—</span>
+              <span class="metric-sub">No response-time SLA is measured</span>
             </div>
           </div>
 
           <!-- AI-Generated Recommendations Box -->
           <div class="card">
             <div class="card-title">
-              <span>Dynamic AI Recommendations</span>
-              <span class="badge badge-amber">Generated from live data</span>
+              <span>Workplace Suggestions</span>
+              <span class="badge badge-amber">Prototype feature</span>
             </div>
             <div class="recommendations-box" id="homeRecommendationsBox">
               <div style="font-size:13px; color:var(--text-dim);">Analyzing current workplace state...</div>
@@ -2121,50 +2116,46 @@
           <div class="metrics-grid">
             <div class="metric-card">
               <span class="metric-title">Inclusion Index</span>
-              <span class="metric-value">91.8%</span>
-              <span class="metric-sub">Resolved accommodation rate</span>
+              <span class="metric-value">—</span>
+              <span class="metric-sub">No verified outcome rate</span>
             </div>
             <div class="metric-card">
               <span class="metric-title">Avg Resolution</span>
-              <span class="metric-value">2.4 Days</span>
-              <span class="metric-sub">Fastest in industry</span>
+              <span class="metric-value">—</span>
+              <span class="metric-sub">No resolution-time benchmark</span>
             </div>
             <div class="metric-card">
               <span class="metric-title">Workload Balance</span>
-              <span class="metric-value">Optimal</span>
-              <span class="metric-sub">Departmental parity</span>
+              <span class="metric-value">Demo</span>
+              <span class="metric-sub">Not an employment assessment</span>
             </div>
             <div class="metric-card">
               <span class="metric-title">Anonymous Share</span>
-              <span class="metric-value">67%</span>
-              <span class="metric-sub">Protected submissions</span>
+              <span class="metric-value">—</span>
+              <span class="metric-sub">No verified report statistic</span>
             </div>
           </div>
 
           <div class="card">
             <div class="card-title">Inclusion Indicators & Accessibility Accommodations</div>
             <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
-              INCLUAI 2.0 tracks workplace inclusion by analyzing recurring friction points without exposing individual
-              employee identities.
+              This prototype provides analytics views for human review. Demo data should not be treated as evidence of workforce outcomes.
             </p>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
               <div
                 style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); padding: 14px; border-radius: var(--radius-sm);">
                 <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">♿ Digital Accessibility</div>
-                <div style="font-size: 12.5px; color: var(--text-muted);">94% of internal documents now comply with
-                  screen-reader ARIA contrast and layout standards.</div>
+                <div style="font-size: 12.5px; color: var(--text-muted);">Accessibility-oriented controls are included, but the app has not been independently audited for WCAG conformance.</div>
               </div>
               <div
                 style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); padding: 14px; border-radius: var(--radius-sm);">
                 <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">🏢 Facilities Accommodations</div>
-                <div style="font-size: 12.5px; color: var(--text-muted);">Conference rooms equipped with wheelchair
-                  ramps and ergonomic standing desks across all hubs.</div>
+                <div style="font-size: 12.5px; color: var(--text-muted);">The prototype does not connect to facilities systems or track physical accommodation outcomes.</div>
               </div>
               <div
                 style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); padding: 14px; border-radius: var(--radius-sm);">
-                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">🤝 Anti-Retaliation Guarantee</div>
-                <div style="font-size: 12.5px; color: var(--text-muted);">Zero retaliation incidents logged with
-                  automated metadata stripping in database records.</div>
+                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">🤝 Reporting Boundary</div>
+                <div style="font-size: 12.5px; color: var(--text-muted);">Anonymous reports omit the submitter account ID; the text itself may identify the author.</div>
               </div>
             </div>
           </div>
@@ -2177,7 +2168,7 @@
           <div class="page-header">
             <div>
               <h1 class="page-title">Reports & Inclusion Hub</h1>
-              <p class="page-subtitle">Submit and review workplace concerns with server-side anonymity protection.</p>
+              <p class="page-subtitle">Submit workplace concerns and review reports allowed by your role. Anonymous reports omit the submitter account ID, but text may identify the author.</p>
             </div>
             <div style="display: flex; gap: 8px;">
               <button class="btn btn-outline btn-sm" onclick="exportReports('csv')">Export CSV</button>
@@ -2488,23 +2479,23 @@
           <div class="metrics-grid" style="margin-bottom:24px;">
             <div class="metric-card">
               <span class="metric-title">Total Records</span>
-              <span class="metric-value" id="appDatasetTotal">4,653</span>
-              <span class="metric-sub">Verified workforce records</span>
+              <span class="metric-value" id="appDatasetTotal">—</span>
+              <span class="metric-sub">Loaded after authorization</span>
             </div>
             <div class="metric-card">
               <span class="metric-title">Retention Rate</span>
-              <span class="metric-value" id="appDatasetRetention" style="color:var(--teal);">65.7%</span>
-              <span class="metric-sub" id="appDatasetRetainedCount">3,053 retained</span>
+              <span class="metric-value" id="appDatasetRetention" style="color:var(--teal);">—</span>
+              <span class="metric-sub" id="appDatasetRetainedCount">—</span>
             </div>
             <div class="metric-card">
               <span class="metric-title">Turnover Rate</span>
-              <span class="metric-value" id="appDatasetAttrition" style="color:var(--red);">34.3%</span>
-              <span class="metric-sub danger" id="appDatasetLeftCount">1,600 departed</span>
+              <span class="metric-value" id="appDatasetAttrition" style="color:var(--red);">—</span>
+              <span class="metric-sub danger" id="appDatasetLeftCount">—</span>
             </div>
             <div class="metric-card">
               <span class="metric-title">Bench Ratio</span>
-              <span class="metric-value" id="appDatasetBench">10.3%</span>
-              <span class="metric-sub" style="color:var(--amber);">477 ever benched</span>
+              <span class="metric-value" id="appDatasetBench">—</span>
+              <span class="metric-sub" style="color:var(--amber);">—</span>
             </div>
           </div>
 
@@ -2550,7 +2541,7 @@
           <!-- Dataset Table -->
           <div class="card" style="padding:0; overflow:hidden;">
             <div style="padding:14px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); background:rgba(255,255,255,0.02);">
-              <span id="appDatasetCountSummary" style="font-size:13px; font-weight:600; color:var(--text-muted);">Showing 1–25 of 4,653 records</span>
+              <span id="appDatasetCountSummary" style="font-size:13px; font-weight:600; color:var(--text-muted);">Records load after authorization</span>
               <a href="/dataset.html" target="_blank" class="btn btn-outline btn-sm" style="color:var(--teal); border-color:var(--teal);">
                 Open Dedicated Page ↗
               </a>

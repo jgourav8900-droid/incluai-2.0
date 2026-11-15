@@ -80,6 +80,10 @@ app.use((req, res, next) => {
 });
 
 // Serve static frontend assets
+// Dataset files are kept out of the public static surface; use the authenticated API.
+app.get(['/data/employee_attrition.json', '/data/employee_attrition.csv'], (req, res) => {
+  res.sendStatus(404);
+});
 app.use(express.static(path.join(__dirname, 'public'), { etag: false, maxAge: 0 }));
 
 // Mount Versioned API Routes

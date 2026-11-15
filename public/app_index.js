@@ -225,7 +225,7 @@ const timelineData=[
   {badge:'STAGE 02 &middot; POLICY SEARCH',title:'Policy Search & AI Responses',
    desc:'Searches available company policy documents and can include a source citation. AI responses may be incomplete or incorrect.',
    list:['&#10004; Search configured policy documents','&#10004; Citations refer to indexed source documents','&#10004; Verify important answers against the source'],
-   code:'// Vector Cosine Similarity Search\nconst matches = ragService.searchCompanyDocuments(\n  companyId, userPrompt, 0.10\n);\n// Match: Hybrid Remote Work Policy (Score: 0.94)\n// Grounded citation: "Section 3.2 - Out of State Work"'},
+   code:'// Policy document search\nconst matches = ragService.searchCompanyDocuments(\n  companyId, userPrompt\n);\n// Review matching source documents\n// A match score is not a guarantee of answer accuracy'},
   {badge:'STAGE 03 &middot; REPORT PRIVACY',title:'Anonymous Report Submission',
    desc:'Anonymous submissions are stored without the submitting account ID. Report text can still contain identifying details.',
    list:['&#10004; Account ID omitted for anonymous submissions','&#10004; HR/Admin access is required to review reports','&#10004; Avoid identifying details when anonymity matters'],
@@ -279,14 +279,21 @@ async function executeDemoQuery(query){
     const res=await fetch('/api/v2/copilot/demo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:query})});
     const data=await res.json();
     if(data.success){
-      const ans=data.response||data.answer||'Query verified and grounded against company policy.';
-      const cite=data.citation?.title||(data.sources&&data.sources[0]?.title)||'Hybrid Remote Work Policy 2026';
-      aiBubble.innerHTML='<div style="font-weight:700;margin-bottom:6px;color:var(--b);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;"><span>&#129302; Grounded AI Response</span><span style="font-size:11px;color:var(--teal);font-family:JetBrains Mono;">&#9889; '+escapeHTML(data.provider||'Offline fallback')+' &middot; '+escapeHTML(Number(data.latencyMs)||0)+'ms</span></div><div style="line-height:1.6;white-space:pre-wrap;">'+escapeHTML(ans)+'</div><div style="margin-top:10px;"><span style="display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(0,229,255,0.12);border:1px solid var(--b);font-size:11px;color:var(--b);">&#128196; '+escapeHTML(cite)+'</span></div><div style="margin-top:12px;font-size:12px;"><a href="/app" style="color:var(--b);text-decoration:none;font-weight:600;">Open in Workplace Platform 2.0 &#8594;</a></div>';
+      const ans=data.response||data.answer;
+      const cite=data.citation?.title||(data.sources&&data.sources[0]?.title);
+      if(!ans){
+        aiBubble.textContent='The assistant returned no answer. Check the source documents or try again.';
+        return;
+      }
+      const citationMarkup=cite
+        ? '<div style="margin-top:10px;"><span style="display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(0,229,255,0.12);border:1px solid var(--b);font-size:11px;color:var(--b);">&#128196; '+escapeHTML(cite)+'</span></div>'
+        : '<div style="margin-top:10px;font-size:12px;color:var(--muted);">No source citation was returned.</div>';
+      aiBubble.innerHTML='<div style="font-weight:700;margin-bottom:6px;color:var(--b);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;"><span>&#129302; AI Response</span><span style="font-size:11px;color:var(--teal);font-family:JetBrains Mono;">&#9889; '+escapeHTML(data.provider||'Provider not reported')+' &middot; '+escapeHTML(Number(data.latencyMs)||0)+'ms</span></div><div style="line-height:1.6;white-space:pre-wrap;">'+escapeHTML(ans)+'</div>'+citationMarkup+'<div style="margin-top:12px;font-size:12px;"><a href="/app" style="color:var(--b);text-decoration:none;font-weight:600;">Open in Workplace Platform 2.0 &#8594;</a></div>';
     }else{
-      aiBubble.innerHTML='<strong>Copilot:</strong> Based on our Hybrid Remote Work and Accessibility Handbooks: Remote work is supported across approved jurisdictions with standard 2.4-day accommodation routing.';
+      aiBubble.textContent=data.error||'The policy assistant could not answer this question. Try again or open the source documents in the workplace app.';
     }
   }catch(err){
-    aiBubble.innerHTML='<div style="font-weight:700;margin-bottom:4px;color:var(--b);">&#129302; Grounded Response</div><div>Yes! Our policy allows up to 30 consecutive business days of remote work from any domestic jurisdiction per calendar year with manager approval via the Workplace Platform.</div><div style="margin-top:8px;"><span style="display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(0,229,255,0.12);border:1px solid var(--b);font-size:11px;color:var(--b);">&#128196; Hybrid Remote Work Policy 2026 (Section 3.2)</span></div>';
+    aiBubble.textContent='The demo assistant is currently unavailable. Start the server and try again.';
   }finally{
     if(sendBtn)sendBtn.disabled=false;
     feed.scrollTop=feed.scrollHeight;
@@ -334,36 +341,28 @@ async function voteRoadmap(featId){
     const res=await fetch('/api/v2/analytics/roadmap-vote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({featureId:featId})});
     const data=await res.json();
     if(data.success&&btn){btn.innerHTML='<span>&#128077; Voted ('+data.newVoteCount+')</span>';btn.style.borderColor='var(--b)';btn.style.color='var(--b)';}
-  }catch(e){if(btn)btn.innerHTML='<span>&#128077; Voted (438)</span>';}
+  }catch(e){if(btn)btn.textContent='Voting is currently unavailable';}
 }
-
-/* ── Hype Slider ── */
-const hypeSlider=$('#vHype'),hypeVal=$('#hypeVal');
-if(hypeSlider&&hypeVal){hypeSlider.addEventListener('input',()=>hypeVal.textContent=hypeSlider.value+'%');}
 
 /* ── Waitlist Form ── */
 const vibeForm=$('#vibeForm');
 if(vibeForm){
   vibeForm.addEventListener('submit',async e=>{
     e.preventDefault();
-    const name=($('#vName')||{}).value?.trim()||'';
     const email=($('#vEmail')||{}).value?.trim()||'';
-    const mood=document.querySelector('input[name="mood"]:checked')?.value||'running on iced coffee';
-    const hype=parseInt(($('#vHype')||{}).value,10)||85;
-    const msg=($('#vMsg')||{}).value?.trim()||'';
     const label=$('#vSubmitLabel');
-    if(label)label.textContent='Reserving your spot...';
+    if(label)label.textContent='Registering your interest...';
     try{
-      const res=await fetch('/api/v2/waitlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,mood,hype,msg})});
+      const res=await fetch('/api/v2/waitlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
       const data=await res.json();
       if(data.success){
-        if(label)label.textContent='Spot Secured \u2746';
-        const t=$('#vipSuccessTitle');if(t)t.textContent='Spot #'+(data.member?.spotNumber||'249')+' Reserved \u2746';
-        const d=$('#vipSuccessDesc');if(d)d.textContent=data.message||'Your early-access interest has been recorded.';
+        if(label)label.textContent='Interest registered';
+        const t=$('#vipSuccessTitle');if(t)t.textContent='Thanks for your interest';
+        const d=$('#vipSuccessDesc');if(d)d.textContent=data.message||'Your interest has been recorded. This does not create a workplace account.';
         const b=$('#waitlistSuccessBanner');if(b)b.style.display='block';
         loadStats();
-      }else{if(label)label.textContent='Error: '+(data.error||'Try again');}
-    }catch(err){if(label)label.textContent='Offline fallback';}
+      }else{if(label)label.textContent=data.error||'Could not register. Try again.';}
+    }catch(err){if(label)label.textContent='Could not connect. Please try again.';}
   });
 }
 
@@ -373,17 +372,7 @@ async function loadStats(){
     const res=await fetch('/api/v2/waitlist/stats');
     const data=await res.json();
     if(data.success){
-      const sc=$('#statCount');if(sc)sc.textContent=data.totalCount+'+';
-      const sh=$('#statHype');if(sh)sh.textContent=data.averageHype+'%';
-    }
-  }catch(e){}
-  try{
-    const res2=await fetch('/api/v2/analytics/public');
-    const data2=await res2.json();
-    if(data2.success&&data2.telemetry){
-      const a=$('#impactAccuracy');if(a)a.textContent=data2.telemetry.groundingAccuracy+'%';
-      const s=$('#impactSLA');if(s)s.textContent=data2.telemetry.avgResolutionDays+' Days';
-      const r=$('#impactRecords');if(r)r.textContent=Number(data2.telemetry.totalDataPoints).toLocaleString()+'+';
+      const sc=$('#statCount');if(sc)sc.textContent=String(data.totalCount);
     }
   }catch(e){}
 }
