@@ -1,0 +1,30 @@
+{
+  "purpose": "INCLUAI is an inclusive workplace intelligence platform that provides AI‑driven assistance, policy guidance, reporting, and analytics to promote equity and accessibility within an organization.",
+  "objectives": [
+    "Enable employees to access company policies and support resources instantly.",
+    "Provide real‑time AI Copilot for queries, document drafting, and navigation.",
+    "Collect anonymous barrier reports with zero‑retaliation guarantees.",
+    "Offer managers dashboards and analytics on inclusion metrics and SLA performance."
+  ],
+  "features": {
+    "copilot": "AI chat interface powered by Gemini, supports policy answers, email drafts, rewrites, and project guidance.",
+    "dashboard": "Admin knowledge dashboard for uploading documents, managing sources, and viewing usage stats.",
+    "reports": "Anonymous reporting system with cryptographic hashing and secure storage.",
+    "dataset": "Explorer for employee, task, and policy data stored in encrypted JSON DB.",
+    "auth": "JWT based authentication with role‑based access control (Employee, HR_Admin, Organization_Admin)."
+  },
+  "architecture": {
+    "frontend": "Static HTML/JS served from /public, uses fetch to call /api/v2 endpoints, includes Three.js background.",
+    "backend": "Node.js Express server (server.js) exposing versioned API under /api/v2, uses services for AI, RAG, DB, auth.",
+    "database": "JSON file data/db.json accessed via services/dbService.js, contains users, documents, reports, tasks, notifications, conversations.",
+    "ai": "services/aiService.js orchestrates intent detection, RAG lookup, Gemini live calls, web search fallback, conversation history.",
+    "rag": "services/ragService.js performs simple token similarity; will be enhanced with embeddings.",
+    "embeddings": "services/embeddingService.js generates Gemini embeddings and stores them in data/embeddings.json."
+  },
+  "workflows": {
+    "employee_query": "User sends chat → AI Service retrieves recent conversation, performs intent detection, fetches relevant docs (project knowledge + company docs), calls Gemini, returns response with citations.",
+    "admin_upload": "Admin uses /api/v2/knowledge/upload (multipart) → file parsed, text extracted, embedding stored, document entry added to DB.",
+    "report_submission": "Anonymous user fills form → server strips identifiers, stores hashed report, notifies admins."
+  }
+}
+

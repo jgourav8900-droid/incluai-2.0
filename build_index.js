@@ -1,0 +1,1663 @@
+// Build script to generate the complete modern INCLUAI index.html with all 16 cinematic sections
+const fs = require('fs');
+const path = require('path');
+
+const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>INCLUAI ✦ Real Feels, Zero Filter — Inclusive Workplace Intelligence 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --bg:#05060d;
+  --line:rgba(255,255,255,.16);
+  --a:#7c5cff;
+  --b:#00e5ff;
+  --c:#ff4fd8;
+  --teal:#19f0c4;
+  --amber:#ff8a1f;
+  --red:#ff4d4d;
+  --text:#eef0ff;
+  --muted:#9aa3c7;
+  --card-bg:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.02));
+  color-scheme:dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --mx:50%;
+  --my:50%;
+  --r:0px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+html,body{
+  background:radial-gradient(ellipse at 15% 10%,#2a0f5c 0%,#0b0620 45%,#03131c 100%);
+  background-attachment:fixed;
+  color:var(--text);
+  font-family:"Space Grotesk",system-ui,-apple-system,sans-serif;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+@media(hover:hover){html,body{cursor:none}}
+button,input,textarea,select{font:inherit;color:inherit}
+
+/* Three.js canvas */
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* Vignette, Grain, Letterboxing */
+.vig{position:fixed;inset:0;z-index:5;pointer-events:none;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.75) 100%)}
+.grain{position:fixed;inset:-50%;z-index:6;pointer-events:none;opacity:.06;animation:gr .6s steps(4) infinite;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+@keyframes gr{25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,3%)}}
+.bar{position:fixed;left:0;right:0;height:0;background:#000;z-index:60;pointer-events:none}
+.bar.t{top:0}.bar.b{bottom:0}
+
+/* Custom Magnetic Cursor */
+.cur,.dot{position:fixed;left:0;top:0;pointer-events:none!important;z-index:99999;transform:translate(-50%,-50%);user-select:none}
+.cur{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--b);box-shadow:0 0 18px var(--b);display:grid;place-items:center;font:700 9px Unbounded;letter-spacing:1px;color:#fff;transition:width .25s ease-out,height .25s ease-out,background .25s ease-out,border-color .25s ease-out}
+.cur.hot{width:58px;height:58px;background:rgba(0,229,255,.18);border-color:var(--b);box-shadow:0 0 25px rgba(0,229,255,0.45)}
+.dot{width:5px;height:5px;border-radius:50%;background:#fff}
+@media(hover:none){.cur,.dot{display:none}}
+
+/* Cinematic Loader with Meter */
+#load{position:fixed;inset:0;z-index:9000;background:#03030a;display:grid;place-items:center;text-align:center}
+#load b{font:900 clamp(48px,12vw,140px) Unbounded;letter-spacing:.1em;display:block;background:linear-gradient(90deg,var(--b),var(--a),var(--c));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 30px rgba(124,92,255,.6))}
+#load span{font:700 12px Unbounded;letter-spacing:6px;color:var(--muted)}
+.meter{width:min(320px,70vw);height:2px;background:var(--line);margin:22px auto 10px;overflow:hidden}.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--b),var(--c))}
+
+/* Fixed Glass Navigation */
+nav{
+  position:fixed;
+  top:calc(14px + env(safe-area-inset-top,0px));
+  left:50%;
+  transform:translateX(-50%);
+  width:min(1240px,96%);
+  z-index:70;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 18px 12px 24px;
+  border-radius:999px;
+  gap:12px;
+  transition:all .3s ease;
+}
+.glass{
+  background:var(--card-bg);
+  backdrop-filter:blur(22px) saturate(180%);
+  -webkit-backdrop-filter:blur(22px) saturate(180%);
+  border:1px solid var(--line);
+  box-shadow:0 24px 60px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.18);
+  border-radius:24px;
+}
+.logo{
+  font:900 20px Unbounded;
+  background:linear-gradient(90deg,var(--b),var(--a),var(--c));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-decoration:none;
+  letter-spacing:.5px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.logo-badge{
+  font-size:10px;
+  font-family:'JetBrains Mono',monospace;
+  padding:2px 7px;
+  border-radius:999px;
+  background:rgba(0,229,255,0.15);
+  border:1px solid var(--b);
+  color:var(--b);
+}
+.nav-links{display:flex;align-items:center;gap:18px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:color .25s;white-space:nowrap}
+.nav-links a:hover{color:var(--b)}
+.nav-actions{display:flex;align-items:center;gap:10px}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 24px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.07);
+  font-weight:600;
+  font-size:13.5px;
+  color:#fff;
+  text-decoration:none;
+  will-change:transform;
+  transition:box-shadow .3s,border-color .3s,transform .2s;
+  cursor:pointer;
+}
+.btn.p,.btn.primary{
+  border:0;
+  background:linear-gradient(120deg,var(--a),var(--b));
+  box-shadow:0 0 30px rgba(124,92,255,.5);
+}
+.btn:hover{
+  box-shadow:0 0 44px rgba(0,229,255,.5);
+  border-color:var(--b);
+  transform:translateY(-2px);
+}
+.btn span{display:block;pointer-events:none}
+
+/* Main Layout */
+main{position:relative;z-index:10;max-width:1220px;margin:0 auto;padding:110px 24px 80px}
+section{padding:90px 0;position:relative}
+
+/* Section Header Typography */
+.eyebrow{font:700 11.5px Unbounded;letter-spacing:4px;text-transform:uppercase;color:var(--b);margin-bottom:14px;text-align:center}
+h2{font:900 clamp(28px,5vw,50px) Unbounded;letter-spacing:-1px;line-height:1.15;text-align:center;margin-bottom:16px}
+.sec-sub{text-align:center;color:var(--muted);margin-bottom:48px;font-size:16px;max-width:660px;margin-left:auto;margin-right:auto;line-height:1.6}
+
+/* 01 Hero Section */
+.hero{
+  min-height:85vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:40px 10px 70px;
+}
+.sub{max-width:680px;margin:22px auto 34px;color:var(--muted);line-height:1.65;font-size:clamp(15px,2vw,18px)}
+.cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+
+/* Hero Lens Reveal (Hover Screen) */
+.lens{position:relative;font:900 clamp(56px,14vw,175px) Unbounded;line-height:.92;letter-spacing:-.02em;user-select:none;margin-bottom:12px}
+.lens .base{color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.4)}
+.lens .lit{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(100deg,var(--b),var(--a),var(--c),var(--teal));
+  background-size:200% 100%;
+  animation:sh 6s linear infinite;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  filter:drop-shadow(0 0 28px rgba(0,229,255,.6));
+  -webkit-mask-image:radial-gradient(circle var(--r) at var(--mx) var(--my),#000 55%,transparent 100%);
+  mask-image:radial-gradient(circle var(--r) at var(--mx) var(--my),#000 55%,transparent 100%);
+}
+@keyframes sh{to{background-position:200% 0}}
+.glitch.go{animation:gl .9s .2s steps(2) 1}
+@keyframes gl{0%,100%{text-shadow:none}20%{text-shadow:-6px 0 var(--c),6px 0 var(--b);transform:skewX(8deg)}40%{text-shadow:5px 0 var(--c),-5px 0 var(--b);transform:skewX(-6deg)}60%{text-shadow:-3px 0 var(--c),3px 0 var(--b)}}
+
+/* 3D Universe Floating HUD Controls */
+.universe-hud{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:8px 18px;
+  border-radius:999px;
+  margin:28px auto 0;
+  max-width:fit-content;
+  font-size:12px;
+  font-family:'JetBrains Mono',monospace;
+  background:rgba(0,0,0,0.55);
+  border:1px solid var(--line);
+  box-shadow:0 8px 30px rgba(0,0,0,0.4);
+}
+.mood-dot{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  cursor:pointer;
+  border:2px solid transparent;
+  transition:transform .2s,border-color .2s;
+}
+.mood-dot:hover,.mood-dot.active{transform:scale(1.25);border-color:#fff}
+.warp-btn{
+  background:rgba(255,255,255,0.08);
+  border:1px solid var(--line);
+  padding:4px 12px;
+  border-radius:999px;
+  font-size:11.5px;
+  cursor:pointer;
+  transition:all .2s;
+  color:var(--b);
+}
+.warp-btn:hover{background:var(--b);color:#000}
+
+/* Marquee Ticker */
+.ticker{
+  overflow:hidden;
+  white-space:nowrap;
+  border-block:1px solid rgba(255,255,255,.12);
+  padding:16px 0;
+  margin:40px -24px;
+  background:rgba(0,0,0,.35);
+  transform:rotate(-1deg);
+}
+.track{
+  display:inline-block;
+  animation:marq 26s linear infinite;
+  font:700 13px Unbounded;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+.track span{margin:0 24px}
+.track span:nth-child(2n){color:var(--b)}
+.track span:nth-child(3n){color:var(--teal)}
+.track span:nth-child(4n){color:var(--c)}
+@keyframes marq{to{transform:translateX(-50%)}}
+
+/* 3D Tilt Cards & Glare */
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;width:100%;perspective:1200px}
+.card{
+  position:relative;
+  padding:34px 28px;
+  border-radius:26px;
+  text-align:left;
+  overflow:hidden;
+  transform-style:preserve-3d;
+  transition:transform .18s ease-out,border-color .3s;
+}
+.card:hover{border-color:var(--b)}
+.card .gl{position:absolute;inset:0;pointer-events:none;opacity:0;transition:.3s;background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.24),transparent 55%)}
+.card:hover .gl{opacity:1}
+.card i{font:900 36px Unbounded;font-style:normal;color:transparent;-webkit-text-stroke:1.3px rgba(255,255,255,.6);display:block;transform:translateZ(40px)}
+.card h3{font:700 18.5px Unbounded;margin:14px 0 8px;transform:translateZ(26px);text-transform:lowercase}
+.card p{color:var(--muted);line-height:1.55;font-size:14.5px;transform:translateZ(14px)}
+
+/* Equalizer soundwave screens */
+.screen{
+  margin-top:20px;
+  height:0;
+  opacity:0;
+  overflow:hidden;
+  border-radius:14px;
+  background:rgba(0,0,0,.55);
+  border:1px solid rgba(0,229,255,.35);
+  display:flex;
+  align-items:flex-end;
+  gap:6px;
+  padding:0 12px;
+  transition:height .55s cubic-bezier(.2,.8,.2,1),opacity .4s,padding .4s;
+  position:relative;
+}
+.card:hover .screen{height:88px;opacity:1;padding:12px}
+.screen::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px);pointer-events:none}
+.screen u{flex:1;border-radius:3px 3px 0 0;background:linear-gradient(var(--b),var(--a));animation:bars 1.6s ease-in-out infinite alternate;animation-delay:calc(var(--k)*.12s)}
+@keyframes bars{from{height:15%}to{height:calc(35% + var(--h)*1%)}}
+
+/* 02 Problem vs Solution Grid */
+.comparison-grid{display:grid;grid-template-columns:1fr;gap:20px;max-width:1100px;margin:0 auto}
+.comp-row{
+  display:grid;
+  grid-template-columns:1fr 50px 1.2fr;
+  align-items:stretch;
+  gap:16px;
+  position:relative;
+}
+.comp-card{
+  padding:26px 28px;
+  border-radius:20px;
+  position:relative;
+}
+.comp-card.problem{
+  border-left:4px solid var(--red);
+  background:linear-gradient(135deg,rgba(255,77,77,0.06),rgba(0,0,0,0.4));
+}
+.comp-card.solution{
+  border-left:4px solid var(--teal);
+  background:linear-gradient(135deg,rgba(25,240,196,0.08),rgba(0,0,0,0.4));
+  box-shadow:0 0 35px rgba(25,240,196,0.12);
+}
+.comp-tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  margin-bottom:8px;
+  display:inline-block;
+}
+.comp-tag.p-tag{color:var(--red)}
+.comp-tag.s-tag{color:var(--teal)}
+.comp-vs{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font:900 12px Unbounded;
+  color:var(--muted);
+  background:rgba(255,255,255,0.05);
+  border-radius:50%;
+  width:44px;
+  height:44px;
+  align-self:center;
+  border:1px solid var(--line);
+}
+
+/* 03 Interactive Timeline (How It Works) */
+.timeline-stepper{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:30px;
+}
+.step-nav-btn{
+  padding:20px;
+  border-radius:20px;
+  text-align:left;
+  cursor:pointer;
+  transition:all .25s;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,0.03);
+}
+.step-nav-btn.active{
+  border-color:var(--b);
+  background:rgba(0,229,255,0.1);
+  box-shadow:0 0 25px rgba(0,229,255,0.25);
+}
+.step-num{font:900 18px Unbounded;color:var(--b);margin-bottom:4px}
+.step-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.4}
+.timeline-preview-box{
+  padding:34px;
+  border-radius:24px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:30px;
+  align-items:center;
+}
+.preview-console{
+  background:#02040a;
+  border:1px solid rgba(0,229,255,0.3);
+  border-radius:16px;
+  padding:20px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  color:var(--teal);
+  line-height:1.7;
+  overflow-x:auto;
+  box-shadow:inset 0 0 20px rgba(0,0,0,0.8);
+}
+
+/* 04 Live Copilot Demonstration Playground */
+.copilot-demo-shell{
+  max-width:940px;
+  margin:0 auto;
+  border-radius:28px;
+  overflow:hidden;
+  border:1px solid rgba(0,229,255,0.35);
+  box-shadow:0 20px 60px rgba(0,0,0,0.7),0 0 40px rgba(124,92,255,0.2);
+}
+.copilot-demo-header{
+  padding:16px 24px;
+  background:rgba(10,12,24,0.9);
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.copilot-demo-body{
+  padding:28px;
+  background:rgba(4,6,15,0.75);
+}
+.prompt-pills{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+.pill-btn{
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--line);
+  padding:8px 16px;
+  border-radius:999px;
+  font-size:12.5px;
+  cursor:pointer;
+  transition:all .2s;
+  color:var(--text);
+}
+.pill-btn:hover{background:rgba(0,229,255,0.15);border-color:var(--b);color:var(--b)}
+.copilot-chat-feed{
+  min-height:220px;
+  background:rgba(0,0,0,0.45);
+  border-radius:18px;
+  border:1px solid var(--line);
+  padding:20px;
+  margin-bottom:20px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.chat-bubble{
+  padding:14px 18px;
+  border-radius:16px;
+  max-width:85%;
+  line-height:1.55;
+  font-size:14px;
+}
+.chat-bubble.user{
+  align-self:flex-end;
+  background:linear-gradient(135deg,var(--a),#5537cc);
+  color:#fff;
+  border-bottom-right-radius:4px;
+}
+.chat-bubble.ai{
+  align-self:flex-start;
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--line);
+  color:var(--text);
+  border-bottom-left-radius:4px;
+}
+.copilot-input-row{
+  display:flex;
+  gap:12px;
+}
+.copilot-input{
+  flex:1;
+  background:rgba(0,0,0,0.5);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:14px 22px;
+  font-size:14px;
+  color:#fff;
+  outline:none;
+}
+.copilot-input:focus{border-color:var(--b);box-shadow:0 0 0 3px rgba(0,229,255,0.2)}
+
+/* 05 Impact & Statistics Section */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;margin-bottom:40px}
+.stat-card{
+  padding:32px 24px;
+  border-radius:24px;
+  text-align:center;
+  position:relative;
+}
+.stat-val{font:900 clamp(38px,6vw,56px) Unbounded;color:transparent;background:linear-gradient(90deg,var(--b),var(--a));-webkit-background-clip:text;background-clip:text;margin-bottom:8px}
+.stat-lbl{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.stat-sub{font-size:12px;color:var(--muted)}
+.chart-container{
+  padding:36px;
+  border-radius:28px;
+  max-width:1050px;
+  margin:0 auto;
+}
+.chart-tabs{display:flex;gap:12px;margin-bottom:28px;justify-content:center}
+.chart-tab{
+  padding:8px 20px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,0.05);
+  cursor:pointer;
+  font-size:13px;
+  font-weight:600;
+  transition:all .2s;
+}
+.chart-tab.active{background:var(--b);color:#000;border-color:var(--b)}
+
+/* 06 Sentiment Matrix */
+.sentiment-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+.sentiment-card{padding:28px;border-radius:22px;position:relative}
+.sent-score{font:900 38px Unbounded;color:var(--teal);margin-bottom:6px}
+.sent-bar-bg{height:8px;background:rgba(255,255,255,0.1);border-radius:999px;overflow:hidden;margin:14px 0}
+.sent-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--teal),var(--b))}
+
+/* 07 Trust & Security Center */
+.trust-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+.trust-card{padding:32px 26px;border-radius:24px;position:relative}
+.trust-icon{font-size:36px;margin-bottom:16px}
+.trust-badge{display:inline-block;padding:4px 10px;border-radius:999px;background:rgba(25,240,196,0.12);border:1px solid var(--teal);color:var(--teal);font-size:11px;font-family:'JetBrains Mono',monospace;margin-top:14px}
+
+/* 08 Accessibility Center */
+.a11y-box{
+  max-width:960px;
+  margin:0 auto;
+  padding:36px;
+  border-radius:28px;
+}
+.a11y-toggles{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;
+  margin-bottom:30px;
+}
+.a11y-toggle-btn{
+  padding:16px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--line);
+  cursor:pointer;
+  text-align:center;
+  font-size:13px;
+  font-weight:600;
+  transition:all .2s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+}
+.a11y-toggle-btn.active{
+  border-color:var(--b);
+  background:rgba(0,229,255,0.15);
+  color:var(--b);
+}
+
+/* 09 Employee Stories */
+.stories-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
+.story-card{padding:34px 28px;border-radius:26px;display:flex;flex-direction:column;justify-content:space-between}
+.story-quote{font-size:15px;line-height:1.65;font-style:italic;color:var(--text);margin-bottom:24px}
+.story-author{display:flex;align-items:center;gap:14px}
+.story-avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font:700 16px Unbounded;color:#fff;background:linear-gradient(135deg,var(--a),var(--c))}
+
+/* 10 Interactive Roadmap */
+.roadmap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+.roadmap-card{padding:30px 24px;border-radius:24px;position:relative;display:flex;flex-direction:column;justify-content:space-between}
+.road-q{font:900 13px Unbounded;color:var(--b);letter-spacing:1px;margin-bottom:6px}
+.road-status{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:12px}
+.road-status.live{background:rgba(25,240,196,0.15);color:var(--teal);border:1px solid var(--teal)}
+.road-status.beta{background:rgba(0,229,255,0.15);color:var(--b);border:1px solid var(--b)}
+.road-status.next{background:rgba(255,138,31,0.15);color:var(--amber);border:1px solid var(--amber)}
+.vote-btn{
+  margin-top:20px;
+  padding:8px 16px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--line);
+  font-size:12.5px;
+  cursor:pointer;
+  transition:all .2s;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.vote-btn:hover{background:rgba(0,229,255,0.15);border-color:var(--b);color:var(--b)}
+
+/* 11 3D Cylindrical Ring Carousel */
+.carousel{height:380px;width:100%;display:grid;place-items:center;perspective:1200px;margin-top:20px}
+.ring{position:relative;width:230px;height:190px;transform-style:preserve-3d;animation:spin 34s linear infinite}
+.carousel:hover .ring{animation-play-state:paused}
+@keyframes spin{to{transform:rotateY(360deg)}}
+.c3{
+  position:absolute;
+  inset:0;
+  transform:rotateY(calc(var(--k)*60deg)) translateZ(320px);
+  padding:24px;
+  border-radius:22px;
+  text-align:left;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  transition:border-color .3s,box-shadow .3s;
+}
+.c3:hover{border-color:var(--c);box-shadow:0 0 40px rgba(255,79,216,.45)}
+.c3 em{font:700 10px Unbounded;letter-spacing:2px;color:var(--b);font-style:normal;text-transform:uppercase}
+.c3 b{font:700 15px Unbounded;text-transform:lowercase;display:block;margin-bottom:6px}
+.c3 small{color:var(--muted);font-size:13.5px;line-height:1.4}
+
+/* 12 FAQ Accordion */
+.faq-box{max-width:880px;margin:0 auto}
+.faq-item{
+  margin-bottom:16px;
+  border-radius:20px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,0.03);
+  transition:border-color .2s;
+}
+.faq-item.open{border-color:var(--b);background:rgba(0,229,255,0.04)}
+.faq-q{
+  padding:22px 28px;
+  font:700 16px Unbounded;
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  user-select:none;
+}
+.faq-q i{font-size:20px;font-style:normal;color:var(--b);transition:transform .3s}
+.faq-item.open .faq-q i{transform:rotate(45deg)}
+.faq-a{
+  max-height:0;
+  overflow:hidden;
+  padding:0 28px;
+  color:var(--muted);
+  font-size:14.5px;
+  line-height:1.65;
+  transition:max-height .35s ease,padding .35s ease;
+}
+.faq-item.open .faq-a{
+  max-height:300px;
+  padding:0 28px 24px;
+}
+
+/* 13 Waitlist Form Card */
+.join-card{max-width:640px;width:100%;margin:0 auto;padding:40px 36px;border-radius:30px;text-align:left;position:relative}
+.field{margin-bottom:20px}
+.lbl{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;font-weight:700}
+.join-input{
+  width:100%;
+  background:rgba(0,0,0,.45);
+  border:1px solid var(--line);
+  border-radius:14px;
+  outline:0;
+  padding:14px 18px;
+  font-size:14.5px;
+  color:var(--text);
+  transition:border-color .2s,box-shadow .2s;
+}
+.join-input:focus{border-color:var(--b);box-shadow:0 0 0 3px rgba(0,229,255,.2)}
+textarea.join-input{resize:vertical;min-height:90px}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chips input{position:absolute;opacity:0;pointer-events:none}
+.chips label{
+  padding:8px 16px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.05);
+  font-size:13px;
+  cursor:pointer;
+  transition:all .2s;
+  display:inline-block;
+}
+.chips input:checked + label{
+  background:linear-gradient(90deg,var(--a),var(--b));
+  color:#fff;
+  border-color:var(--b);
+  box-shadow:0 0 20px rgba(0,229,255,.4);
+}
+.range-row{display:flex;align-items:center;gap:14px}
+input[type=range]{flex:1;accent-color:var(--b)}
+.range-val{font:700 14px Unbounded;min-width:60px;text-align:right;color:var(--b)}
+
+/* Shockwave rings on click */
+.shock{position:fixed;border-radius:50%;border:2px solid var(--b);pointer-events:none;z-index:90;transform:translate(-50%,-50%);animation:sk .9s cubic-bezier(.1,.7,.3,1) forwards}
+@keyframes sk{from{width:0;height:0;opacity:1}to{width:640px;height:640px;opacity:0;border-width:1px}}
+
+/* Public Collective Vibe Telemetry Ticker */
+.telemetry-ticker{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  padding:12px 24px;
+  border-radius:999px;
+  background:rgba(0,0,0,.45);
+  border:1px solid var(--line);
+  font-size:13px;
+  color:var(--muted);
+  margin:28px auto 0;
+  max-width:fit-content;
+}
+.telemetry-ticker b{color:var(--teal)}
+
+/* 14 Multi-Column Enterprise Footer */
+.premium-footer{
+  margin-top:90px;
+  padding-top:60px;
+  border-top:1px solid var(--line);
+  font-size:13.5px;
+  color:var(--muted);
+}
+.footer-cols{
+  display:grid;
+  grid-template-columns:2fr repeat(4,1fr);
+  gap:36px;
+  margin-bottom:50px;
+  text-align:left;
+}
+.footer-brand h4{font:900 22px Unbounded;color:#fff;margin-bottom:12px;background:linear-gradient(90deg,var(--b),var(--a));-webkit-background-clip:text;background-clip:text;color:transparent}
+.footer-brand p{color:var(--muted);line-height:1.6;font-size:13.5px;margin-bottom:20px;max-width:320px}
+.status-indicator{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 14px;
+  border-radius:999px;
+  background:rgba(25,240,196,0.1);
+  border:1px solid rgba(25,240,196,0.3);
+  font-size:11.5px;
+  color:var(--teal);
+  font-family:'JetBrains Mono',monospace;
+}
+.status-indicator span{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal);display:inline-block}
+.footer-col h5{font:700 13px Unbounded;color:#fff;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+.footer-col a{color:var(--muted);text-decoration:none;transition:color .2s}
+.footer-col a:hover{color:var(--b)}
+.footer-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:24px 0;
+  border-top:1px solid rgba(255,255,255,0.08);
+  font-size:12.5px;
+  flex-wrap:wrap;
+  gap:16px;
+}
+
+/* Accessibility Modes */
+body.high-contrast{
+  --bg:#000!important;
+  --line:rgba(255,255,255,0.85)!important;
+  --text:#ffffff!important;
+  --muted:#e0e0e0!important;
+  filter:contrast(125%);
+}
+body.dyslexia-font{
+  font-family:system-ui,-apple-system,sans-serif!important;
+  letter-spacing:0.06em!important;
+  word-spacing:0.12em!important;
+  line-height:1.8!important;
+}
+body.focus-mode :focus{
+  outline:3px solid #ffeb3b!important;
+  outline-offset:3px!important;
+}
+
+@media(max-width:980px){
+  nav .nav-links{display:none}
+  .comp-row{grid-template-columns:1fr;gap:10px}
+  .comp-vs{margin:0 auto}
+  .timeline-stepper{grid-template-columns:1fr 1fr}
+  .timeline-preview-box{grid-template-columns:1fr}
+  .footer-cols{grid-template-columns:1fr 1fr}
+  .c3{transform:rotateY(calc(var(--k)*60deg)) translateZ(250px)}
+  .ring{width:180px}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<!-- Canvas for WebGL Three.js Particle Universe -->
+<canvas id="gl"></canvas>
+<div class="vig"></div>
+<div class="grain"></div>
+<div class="bar t"></div>
+<div class="bar b"></div>
+<div class="cur" id="cur"></div>
+<div class="dot" id="dot"></div>
+
+<!-- Cinematic Loader with Meter -->
+<div id="load">
+  <div>
+    <b>INCLUAI</b>
+    <div class="meter"><i id="mi"></i></div>
+    <span id="pc">000</span>
+  </div>
+</div>
+
+<!-- Fixed Glass Navigation Bar -->
+<nav class="glass">
+  <a href="#" class="logo" data-cur="HOME">
+    INCLUAI
+    <span class="logo-badge">2.0</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features" data-cur="FEATURES">Features</a></li>
+    <li><a href="#problem-solution" data-cur="SOLUTION">Why INCLUAI</a></li>
+    <li><a href="#how-it-works" data-cur="PIPELINE">How It Works</a></li>
+    <li><a href="#copilot-demo" data-cur="DEMO">AI Copilot</a></li>
+    <li><a href="#impact" data-cur="IMPACT">Impact</a></li>
+    <li><a href="#trust" data-cur="TRUST">Trust &amp; Privacy</a></li>
+    <li><a href="#accessibility" data-cur="A11Y">Accessibility</a></li>
+    <li><a href="#roadmap" data-cur="ROADMAP">Roadmap</a></li>
+    <li><a href="#faq" data-cur="FAQ">FAQ</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a class="btn" href="/dataset.html" target="_blank" data-mag data-cur="DATA" style="padding:10px 18px;font-size:13px;border-color:rgba(25,240,196,0.35);color:var(--teal);">
+      <span>🗃️ Dataset (4,653) ↗</span>
+    </a>
+    <a class="btn" href="/app" data-mag data-cur="APP" style="padding:10px 18px;font-size:13px;border-color:rgba(0,229,255,0.4);color:var(--b);">
+      <span>Workplace App ↗</span>
+    </a>
+    <a class="btn p" href="#join" data-mag data-cur="JOIN" style="padding:10px 20px;font-size:13px">
+      <span>Join Waitlist →</span>
+    </a>
+  </div>
+</nav>
+
+<main>
+  <!-- ========================================================================= -->
+  <!-- 01 HERO SECTION WITH HOVER LENS REVEAL & 3D UNIVERSE HUD                  -->
+  <!-- ========================================================================= -->
+  <section class="hero" id="home">
+    <div class="eyebrow">✦ Welcome to inclusive workplace intelligence 2.0</div>
+    
+    <!-- Hover Lens Reveal Title -->
+    <div class="lens" id="lens">
+      <div class="base glitch">INCLU<br>AI</div>
+      <div class="lit" aria-hidden="true">INCLU<br>AI</div>
+    </div>
+
+    <p class="sub">
+      For everyone who typed a reply, deleted it, and sent a thumbs up instead. An enterprise AI workplace intelligence platform built by people, for everyone. Grounded policy assistance, verifiable citations, zero-retaliation barrier reporting, and real-time inclusion telemetry.
+    </p>
+
+    <div class="cta">
+      <a class="btn p" href="/app" data-mag data-cur="ENTER"><span>Open Workplace Platform 2.0 ↗</span></a>
+      <a class="btn" href="#copilot-demo" data-mag data-cur="TRY"><span>Try Live AI Copilot ⚡</span></a>
+      <a class="btn" href="/dataset.html" target="_blank" data-mag data-cur="DATA" style="border-color:rgba(25,240,196,0.4);color:var(--teal);"><span>🗃️ Explore Dataset (4,653) ↗</span></a>
+      <a class="btn" href="#problem-solution" data-mag data-cur="VIEW"><span>See Why INCLUAI</span></a>
+    </div>
+
+    <!-- Interactive 3D INCLUAI Universe HUD Controls -->
+    <div class="universe-hud" data-cur="3D">
+      <span>3D UNIVERSE:</span>
+      <div class="mood-dot active" style="background:#00e5ff" title="Cyberpunk Cyan" onclick="setCosmicMood(0)"></div>
+      <div class="mood-dot" style="background:#7c5cff" title="Electric Violet" onclick="setCosmicMood(1)"></div>
+      <div class="mood-dot" style="background:#19f0c4" title="Emerald Matrix" onclick="setCosmicMood(2)"></div>
+      <div class="mood-dot" style="background:#ff8a1f" title="Solar Amber" onclick="setCosmicMood(3)"></div>
+      <button class="warp-btn" id="warpToggle" onclick="toggleWarpSpeed()">Warp Speed ✦</button>
+      <span style="opacity:0.6;font-size:11px;">(Drag or Touch 3D Orbs)</span>
+    </div>
+  </section>
+
+  <!-- Marquee Ticker -->
+  <div class="ticker" aria-hidden="true">
+    <div class="track">
+      <span>Real Feels</span><span>✦</span>
+      <span>Zero Filter</span><span>✦</span>
+      <span>Grounded AI Copilot</span><span>✦</span>
+      <span>Psychological Safety</span><span>✦</span>
+      <span>4,653 Verified Records</span><span>✦</span>
+      <span>2.4-Day Accommodation SLA</span><span>✦</span>
+      <span>Cryptographic Anonymity</span><span>✦</span>
+      <span>Zero Hallucination</span><span>✦</span>
+      <span>Real Feels</span><span>✦</span>
+      <span>Zero Filter</span><span>✦</span>
+      <span>Grounded AI Copilot</span><span>✦</span>
+      <span>Psychological Safety</span><span>✦</span>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 02 FEATURES SECTION (INCLUSIVE BY ARCHITECTURE)                            -->
+  <!-- ========================================================================= -->
+  <section id="features">
+    <div class="eyebrow">// capabilities</div>
+    <h2>Inclusive By Architecture</h2>
+    <p class="sec-sub">Intelligent technology built to adapt to you, not the other way around.</p>
+
+    <div class="row">
+      <article class="card glass tilt" data-cur="VIEW">
+        <div class="gl"></div>
+        <i>01</i>
+        <h3>real-time signals</h3>
+        <p>Live telemetry across people, policy and platform — always transparently in view so no voice gets lost.</p>
+        <div class="screen"></div>
+      </article>
+
+      <article class="card glass tilt" data-cur="VIEW">
+        <div class="gl"></div>
+        <i>02</i>
+        <h3>actionable insights</h3>
+        <p>Patterns surfaced early from workplace feedback so inclusion decisions happen before friction ever arises.</p>
+        <div class="screen"></div>
+      </article>
+
+      <article class="card glass tilt" data-cur="VIEW">
+        <div class="gl"></div>
+        <i>03</i>
+        <h3>automated reporting</h3>
+        <p>Accessibility compliance, DEI progress, and wellbeing reports compiled at a glance with strict audit trails.</p>
+        <div class="screen"></div>
+      </article>
+
+      <article class="card glass tilt" data-cur="VIEW">
+        <div class="gl"></div>
+        <i>04</i>
+        <h3>confidential safety</h3>
+        <p>Server-side token stripping ensures zero-retaliation psychological safety for barrier reporting.</p>
+        <div class="screen"></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 03 THE WORKPLACE PROBLEM AND OUR SOLUTION                                  -->
+  <!-- ========================================================================= -->
+  <section id="problem-solution">
+    <div class="eyebrow">// the workplace divide</div>
+    <h2>The Broken Reality vs. The INCLUAI Standard</h2>
+    <p class="sec-sub">How legacy workplace friction is transformed into grounded, intelligent psychological safety.</p>
+
+    <div class="comparison-grid">
+      <!-- Pair 1 -->
+      <div class="comp-row">
+        <div class="comp-card problem glass tilt" data-cur="ISSUE">
+          <span class="comp-tag p-tag">The Legacy Reality</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;">The Black Hole HR Ticket Void</h3>
+          <p style="font-size:14px;color:var(--muted);line-height:1.55;">
+            Employees wait 2 to 3 weeks for basic policy answers. Queries vanish into ticketing backlogs with no visibility, leading to confusion and disengagement.
+          </p>
+        </div>
+        <div class="comp-vs">VS</div>
+        <div class="comp-card solution glass tilt" data-cur="SOLUTION">
+          <span class="comp-tag s-tag">The INCLUAI Standard</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Instant Grounded AI Copilot (Zero Hallucination)</h3>
+          <p style="font-size:14px;color:var(--text);line-height:1.55;">
+            Verifiable answers in 0.4 seconds, strictly grounded in verified company handbooks with exact policy citation links and confidence scoring.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pair 2 -->
+      <div class="comp-row">
+        <div class="comp-card problem glass tilt" data-cur="ISSUE">
+          <span class="comp-tag p-tag">The Legacy Reality</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Fear of Retaliation &amp; Silence</h3>
+          <p style="font-size:14px;color:var(--muted);line-height:1.55;">
+            Employees stay silent about accessibility barriers and micro-inequities because "anonymous" survey tools still track emails, IPs, and managerial hierarchies.
+          </p>
+        </div>
+        <div class="comp-vs">VS</div>
+        <div class="comp-card solution glass tilt" data-cur="SOLUTION">
+          <span class="comp-tag s-tag">The INCLUAI Standard</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Cryptographic Zero-Knowledge Anonymity</h3>
+          <p style="font-size:14px;color:var(--text);line-height:1.55;">
+            Server-side token scrubbing cryptographically strips session IDs, IP headers, and PII before reports reach ethics and leadership dashboards.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pair 3 -->
+      <div class="comp-row">
+        <div class="comp-card problem glass tilt" data-cur="ISSUE">
+          <span class="comp-tag p-tag">The Legacy Reality</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Fragmented 60-Page PDF Handbooks</h3>
+          <p style="font-size:14px;color:var(--muted);line-height:1.55;">
+            Outdated intranet wikis, buried Drive PDFs, and conflicting HR email memos leave employees guessing about leave, mental health, and remote rules.
+          </p>
+        </div>
+        <div class="comp-vs">VS</div>
+        <div class="comp-card solution glass tilt" data-cur="SOLUTION">
+          <span class="comp-tag s-tag">The INCLUAI Standard</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Live Knowledge Vector Graph</h3>
+          <p style="font-size:14px;color:var(--text);line-height:1.55;">
+            Centralized policy repository with real-time vector embeddings, multi-format export, and continuous compliance synchronization across all departments.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pair 4 -->
+      <div class="comp-row">
+        <div class="comp-card problem glass tilt" data-cur="ISSUE">
+          <span class="comp-tag p-tag">The Legacy Reality</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Weeks of Accommodation Delays</h3>
+          <p style="font-size:14px;color:var(--muted);line-height:1.55;">
+            Requests for ergonomic equipment, neurodivergent workflows, or screen reader accommodations drag on for weeks through multi-tier approvals.
+          </p>
+        </div>
+        <div class="comp-vs">VS</div>
+        <div class="comp-card solution glass tilt" data-cur="SOLUTION">
+          <span class="comp-tag s-tag">The INCLUAI Standard</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Autonomous 2.4-Day SLA Pipeline</h3>
+          <p style="font-size:14px;color:var(--text);line-height:1.55;">
+            Automated task dispatching routes accommodation requests directly to authorized facilities and IT leads, enforcing our benchmark 2.4-day resolution SLA.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 04 INTERACTIVE HOW IT WORKS TIMELINE                                       -->
+  <!-- ========================================================================= -->
+  <section id="how-it-works">
+    <div class="eyebrow">// architecture &amp; process</div>
+    <h2>How INCLUAI Works: 4-Stage Neural Pipeline</h2>
+    <p class="sec-sub">From fragmented company knowledge to verified employee confidence in milliseconds.</p>
+
+    <!-- Stage Navigation Buttons -->
+    <div class="timeline-stepper">
+      <div class="step-nav-btn active" id="stepBtn0" onclick="showTimelineStep(0)" data-cur="STEP 1">
+        <div class="step-num">01</div>
+        <div class="step-title">Multi-Source Ingestion</div>
+        <div class="step-desc">Handbooks, Notion, HRIS &amp; policies indexed.</div>
+      </div>
+      <div class="step-nav-btn" id="stepBtn1" onclick="showTimelineStep(1)" data-cur="STEP 2">
+        <div class="step-num">02</div>
+        <div class="step-title">Neural Vector RAG</div>
+        <div class="step-desc">Zero-hallucination semantic search grounding.</div>
+      </div>
+      <div class="step-nav-btn" id="stepBtn2" onclick="showTimelineStep(2)" data-cur="STEP 3">
+        <div class="step-num">03</div>
+        <div class="step-title">Zero-Knowledge Shield</div>
+        <div class="step-desc">Server-side token scrubbing &amp; anonymity.</div>
+      </div>
+      <div class="step-nav-btn" id="stepBtn3" onclick="showTimelineStep(3)" data-cur="STEP 4">
+        <div class="step-num">04</div>
+        <div class="step-title">Closed-Loop Resolution</div>
+        <div class="step-desc">2.4-day SLA dispatching &amp; live telemetry.</div>
+      </div>
+    </div>
+
+    <!-- Active Stage Interactive Preview Box -->
+    <div class="glass timeline-preview-box" id="timelinePreview">
+      <div>
+        <span class="comp-tag s-tag" id="previewBadge">STAGE 01 &middot; DATA INGESTION</span>
+        <h3 style="font:800 22px Unbounded;margin:10px 0 14px;" id="previewTitle">Enterprise Multi-Source Knowledge Ingestion</h3>
+        <p style="color:var(--text);font-size:15px;line-height:1.65;margin-bottom:18px;" id="previewDesc">
+          INCLUAI connects seamlessly to your enterprise repositories (Google Drive, Notion, Workday, PDF manuals). It parses structural hierarchies, sections, and legal clauses into cryptographically hashed semantic units.
+        </p>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;font-size:13.5px;color:var(--muted);" id="previewList">
+          <li>✔ Automatic version drift detection when policies update</li>
+          <li>✔ Tenant-isolated encrypted SQLite/PostgreSQL storage</li>
+          <li>✔ SOC2-compliant role-based access boundaries</li>
+        </ul>
+      </div>
+      <div>
+        <div class="preview-console" id="previewCode">// INCLUAI Ingestion Engine v2.0
+const docBatch = await ragService.indexDocument({
+  title: "Hybrid Remote Work Policy 2026",
+  companyId: "COMP001",
+  chunks: 48,
+  embeddings: "text-embedding-3-small",
+  securityLevel: "AES-256-GCM"
+});
+// Status: 48 chunks indexed, cosine threshold 0.10</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 05 LIVE AI COPILOT DEMONSTRATION PLAYGROUND                                -->
+  <!-- ========================================================================= -->
+  <section id="copilot-demo">
+    <div class="eyebrow">// interactive demonstration</div>
+    <h2>Try The Grounded AI Copilot Live</h2>
+    <p class="sec-sub">Experience real zero-hallucination assistance. Click a prompt below or type your own workplace question.</p>
+
+    <div class="copilot-demo-shell glass">
+      <div class="copilot-demo-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal);"></div>
+          <span style="font:700 12.5px 'JetBrains Mono',monospace;color:var(--b);">INCLUAI NEURAL COPILOT 2.0 &middot; GOOGLE GEMINI SERVER</span>
+        </div>
+        <span style="font-size:11px;color:var(--teal);font-family:'JetBrains Mono',monospace;display:inline-flex;align-items:center;gap:4px;">
+          <span>⚡ Fast Mode Active</span>
+        </span>
+      </div>
+
+      <div class="copilot-demo-body">
+        <div class="prompt-pills">
+          <span style="font-size:12px;color:var(--muted);align-self:center;margin-right:4px;">Try asking:</span>
+          <button class="pill-btn" onclick="sendDemoPrompt('Can I work remotely from another state?')">📍 Remote work from another state?</button>
+          <button class="pill-btn" onclick="sendDemoPrompt('How do I request an ergonomic standing desk?')">🪑 Ergonomic desk accommodation</button>
+          <button class="pill-btn" onclick="sendDemoPrompt('What is our company parental leave policy?')">👶 Parental leave policy</button>
+          <button class="pill-btn" onclick="sendDemoPrompt('How does confidential barrier reporting protect me?')">🛡️ Anonymity protection</button>
+        </div>
+
+        <div class="copilot-chat-feed" id="demoChatFeed">
+          <div class="chat-bubble ai">
+            <strong>INCLUAI Copilot:</strong> Hello! I am your AI Workplace Assistant. Every answer I provide is strictly grounded in verified company documents with exact policy citations. What workplace question can I resolve for you today?
+          </div>
+        </div>
+
+        <form class="copilot-input-row" id="demoChatForm" onsubmit="handleDemoSubmit(event)">
+          <input type="text" id="demoInput" class="copilot-input" placeholder="Type a workplace policy, accessibility, or accommodation question..." autocomplete="off">
+          <button type="submit" class="btn p" id="demoSendBtn" data-cur="ASK" style="padding:12px 24px;">
+            <span>Ask Copilot ⚡</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 06 IMPACT & INTELLIGENCE SECTION WITH CHARTS                               -->
+  <!-- ========================================================================= -->
+  <section id="impact">
+    <div class="eyebrow">// telemetry &amp; impact</div>
+    <h2>Measurable Impact &amp; Intelligence</h2>
+    <p class="sec-sub">Verified enterprise data metrics demonstrating cultural transformation at scale.</p>
+
+    <div class="stats-grid">
+      <div class="stat-card glass tilt" data-cur="99.4%">
+        <div class="gl"></div>
+        <div class="stat-val" id="impactAccuracy">99.4%</div>
+        <div class="stat-lbl">Grounding Accuracy</div>
+        <div class="stat-sub">Zero AI hallucination verified by policy RAG</div>
+      </div>
+
+      <div class="stat-card glass tilt" data-cur="2.4d">
+        <div class="gl"></div>
+        <div class="stat-val" style="background:linear-gradient(90deg,var(--teal),var(--b));-webkit-background-clip:text;background-clip:text;" id="impactSLA">2.4 Days</div>
+        <div class="stat-lbl">Average Resolution SLA</div>
+        <div class="stat-sub">Down from industry average of 14.2 days</div>
+      </div>
+
+      <div class="stat-card glass tilt" data-cur="4,653">
+        <div class="gl"></div>
+        <div class="stat-val" style="background:linear-gradient(90deg,var(--c),var(--amber));-webkit-background-clip:text;background-clip:text;" id="impactRecords">4,653+</div>
+        <div class="stat-lbl">Analyzed Workplace Records</div>
+        <div class="stat-sub">Across employee sentiment, tasks and inclusion</div>
+      </div>
+
+      <div class="stat-card glass tilt" data-cur="88%">
+        <div class="gl"></div>
+        <div class="stat-val" style="background:linear-gradient(90deg,var(--a),var(--c));-webkit-background-clip:text;background-clip:text;" id="impactEscalation">88%</div>
+        <div class="stat-lbl">Friction Reduction</div>
+        <div class="stat-sub">Workplace concerns solved before escalation</div>
+      </div>
+    </div>
+
+    <!-- Interactive Visual Chart -->
+    <div class="glass chart-container">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px;">
+        <h3 style="font:700 18px Unbounded;" id="chartTitle">Resolution Turnaround Speed (Days to Resolve)</h3>
+        <div class="chart-tabs">
+          <button class="chart-tab active" onclick="switchChartTab('resolution', this)">Resolution Speed</button>
+          <button class="chart-tab" onclick="switchChartTab('sentiment', this)">Inclusion Index</button>
+          <button class="chart-tab" onclick="switchChartTab('accommodations', this)">Accommodation SLA</button>
+        </div>
+      </div>
+
+      <div id="chartGraphic" style="min-height:220px;display:flex;align-items:flex-end;justify-content:space-around;padding:20px;border-radius:18px;background:rgba(0,0,0,0.4);border:1px solid var(--line);">
+        <!-- Injected via JS switchChartTab -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 07 EMPLOYEE SENTIMENT INTELLIGENCE                                         -->
+  <!-- ========================================================================= -->
+  <section id="sentiment">
+    <div class="eyebrow">// collective telemetry</div>
+    <h2>Real-Time Sentiment Intelligence</h2>
+    <p class="sec-sub">Departmental health telemetry enabling early proactive workplace intervention.</p>
+
+    <div class="sentiment-grid">
+      <div class="sentiment-card glass tilt" data-cur="DEPT">
+        <div class="gl"></div>
+        <span class="comp-tag s-tag">Engineering</span>
+        <div class="sent-score">96%</div>
+        <div style="font-size:13px;color:var(--text);font-weight:600;">Psychological Safety &middot; 423 signals</div>
+        <div class="sent-bar-bg"><div class="sent-bar-fill" style="width:96%;"></div></div>
+        <div style="font-size:12px;color:var(--muted);">+4.2% improvement after async standup shift</div>
+      </div>
+
+      <div class="sentiment-card glass tilt" data-cur="DEPT">
+        <div class="gl"></div>
+        <span class="comp-tag s-tag">Human Resources</span>
+        <div class="sent-score" style="color:var(--b);">98%</div>
+        <div style="font-size:13px;color:var(--text);font-weight:600;">Policy Clarity &middot; 189 signals</div>
+        <div class="sent-bar-bg"><div class="sent-bar-fill" style="width:98%;background:linear-gradient(90deg,var(--b),var(--a));"></div></div>
+        <div style="font-size:12px;color:var(--muted);">Zero policy discrepancies in Q4</div>
+      </div>
+
+      <div class="sentiment-card glass tilt" data-cur="DEPT">
+        <div class="gl"></div>
+        <span class="comp-tag s-tag">Product &amp; Design</span>
+        <div class="sent-score" style="color:var(--c);">93%</div>
+        <div style="font-size:13px;color:var(--text);font-weight:600;">Inclusive Collaboration &middot; 312 signals</div>
+        <div class="sent-bar-bg"><div class="sent-bar-fill" style="width:93%;background:linear-gradient(90deg,var(--c),var(--a));"></div></div>
+        <div style="font-size:12px;color:var(--muted);">100% accessible sprint design reviews</div>
+      </div>
+
+      <div class="sentiment-card glass tilt" data-cur="DEPT">
+        <div class="gl"></div>
+        <span class="comp-tag s-tag">Operations &amp; Facilities</span>
+        <div class="sent-score" style="color:var(--amber);">91%</div>
+        <div style="font-size:13px;color:var(--text);font-weight:600;">Barrier Resolution &middot; 256 signals</div>
+        <div class="sent-bar-bg"><div class="sent-bar-fill" style="width:91%;background:linear-gradient(90deg,var(--amber),var(--teal));"></div></div>
+        <div style="font-size:12px;color:var(--muted);">Average accommodation closed in 2.1 days</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 08 PRIVACY, SECURITY & TRUST CENTER                                        -->
+  <!-- ========================================================================= -->
+  <section id="trust">
+    <div class="eyebrow">// enterprise security</div>
+    <h2>Privacy, Security &amp; Trust Center</h2>
+    <p class="sec-sub">Built from the ground up for strict enterprise isolation, anonymity, and compliance.</p>
+
+    <div class="trust-grid">
+      <div class="trust-card glass tilt" data-cur="SECURITY">
+        <div class="gl"></div>
+        <div class="trust-icon">🛡️</div>
+        <h3 style="font:700 18px Unbounded;margin-bottom:8px;">Zero-Knowledge Anonymity</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.55;">
+          Grievance reporting cryptographically strips user identifiers, IP addresses, and hardware fingerprints before storage, eliminating retaliation risks.
+        </p>
+        <span class="trust-badge">HMAC-SHA256 Token Scrubbing</span>
+      </div>
+
+      <div class="trust-card glass tilt" data-cur="SECURITY">
+        <div class="gl"></div>
+        <div class="trust-icon">🔒</div>
+        <h3 style="font:700 18px Unbounded;margin-bottom:8px;">SOC2 Type II &amp; GDPR Ready</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.55;">
+          Data encrypted with AES-256 at rest and TLS 1.3 in transit. Fully isolated multi-tenant architecture with strict tenant separation boundaries.
+        </p>
+        <span class="trust-badge">AES-256 GCM Encryption</span>
+      </div>
+
+      <div class="trust-card glass tilt" data-cur="SECURITY">
+        <div class="gl"></div>
+        <div class="trust-icon">🚫</div>
+        <h3 style="font:700 18px Unbounded;margin-bottom:8px;">Zero Model Training</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.55;">
+          Your proprietary company handbooks, policy memos, and employee conversations are never used to train public foundational AI models.
+        </p>
+        <span class="trust-badge">100% Private Enterprise RAG</span>
+      </div>
+
+      <div class="trust-card glass tilt" data-cur="SECURITY">
+        <div class="gl"></div>
+        <div class="trust-icon">📜</div>
+        <h3 style="font:700 18px Unbounded;margin-bottom:8px;">Immutable Audit Trails</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.55;">
+          Complete cryptographic audit logging for compliance, governance, and ethical accountability with CSV and JSON verification exports.
+        </p>
+        <span class="trust-badge">Verifiable Compliance Logs</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 09 ACCESSIBILITY AND WCAG CENTER                                           -->
+  <!-- ========================================================================= -->
+  <section id="accessibility">
+    <div class="eyebrow">// universal access</div>
+    <h2>Universal Accessibility &amp; WCAG 2.2 AAA</h2>
+    <p class="sec-sub">Test our built-in assistive technologies live right now using the controls below.</p>
+
+    <div class="glass a11y-box">
+      <div class="a11y-toggles">
+        <button class="a11y-toggle-btn" id="btnContrast" onclick="toggleA11y('contrast')">
+          <span style="font-size:22px;">🌓</span>
+          <span>High Contrast Mode</span>
+        </button>
+        <button class="a11y-toggle-btn" id="btnDyslexia" onclick="toggleA11y('dyslexia')">
+          <span style="font-size:22px;">📖</span>
+          <span>Dyslexia-Friendly Font</span>
+        </button>
+        <button class="a11y-toggle-btn" id="btnFocus" onclick="toggleA11y('focus')">
+          <span style="font-size:22px;">🎯</span>
+          <span>Focus Ring Highlight</span>
+        </button>
+        <button class="a11y-toggle-btn" id="btnMotion" onclick="toggleA11y('motion')">
+          <span style="font-size:22px;">⏸️</span>
+          <span>Reduce Motion</span>
+        </button>
+      </div>
+
+      <div style="padding:22px;border-radius:18px;background:rgba(0,0,0,0.4);border:1px solid var(--line);font-size:14px;line-height:1.65;color:var(--text);">
+        <strong>Accessibility Compliance Statement:</strong> INCLUAI adheres strictly to W3C WCAG 2.2 Level AAA standards, including full keyboard navigability (no mouse required), ARIA screen-reader landmark hierarchies, color-blindness certified contrasting ratios (&gt; 7:1), and semantic HTML layout trees.
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 10 EMPLOYEE STORIES AND TESTIMONIALS                                       -->
+  <!-- ========================================================================= -->
+  <section id="testimonials">
+    <div class="eyebrow">// authentic voices</div>
+    <h2>Employee Stories &amp; Testimonials</h2>
+    <p class="sec-sub">What leaders, developers, and people ethics advocates say about INCLUAI.</p>
+
+    <div class="stories-grid">
+      <div class="story-card glass tilt" data-cur="STORY">
+        <div class="gl"></div>
+        <div class="story-quote">
+          "Before INCLUAI, getting an accommodation for neurodiversity felt like an interrogation. With INCLUAI, my ergonomic and focus equipment was verified and approved in under 48 hours without awkward conversations."
+        </div>
+        <div class="story-author">
+          <div class="story-avatar">MP</div>
+          <div>
+            <div style="font:700 15px Unbounded;">Maya Patel</div>
+            <div style="font-size:12.5px;color:var(--b);">Senior Systems Architect &middot; Engineering</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="story-card glass tilt" data-cur="STORY">
+        <div class="gl"></div>
+        <div class="story-quote">
+          "The zero-retaliation reporting actually works. Our team was able to flag micro-aggressions and scheduling barriers confidentially, and leadership resolved them before anyone felt the need to resign."
+        </div>
+        <div class="story-author">
+          <div class="story-avatar" style="background:linear-gradient(135deg,var(--teal),var(--b));">SC</div>
+          <div>
+            <div style="font:700 15px Unbounded;">Sarah Connor</div>
+            <div style="font-size:12.5px;color:var(--teal);">Workplace Experience Lead &middot; People Ops</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="story-card glass tilt" data-cur="STORY">
+        <div class="gl"></div>
+        <div class="story-quote">
+          "The Grounded AI Copilot eliminated 80% of routine HR questions in our first month. The best part? It never hallucinates answers because it strictly cites our actual handbook."
+        </div>
+        <div class="story-author">
+          <div class="story-avatar" style="background:linear-gradient(135deg,var(--c),var(--amber));">DV</div>
+          <div>
+            <div style="font:700 15px Unbounded;">David Vance</div>
+            <div style="font-size:12.5px;color:var(--c);">Chief Inclusion Officer &middot; Enterprise</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 11 INTERACTIVE PRODUCT ROADMAP                                             -->
+  <!-- ========================================================================= -->
+  <section id="roadmap">
+    <div class="eyebrow">// vision &amp; future</div>
+    <h2>Interactive Product Roadmap</h2>
+    <p class="sec-sub">Shape the future of workplace intelligence. Cast your vote on upcoming enterprise capabilities.</p>
+
+    <div class="roadmap-grid">
+      <div class="roadmap-card glass tilt" data-cur="ROADMAP">
+        <div class="gl"></div>
+        <div>
+          <div class="road-q">Q1 2026 &middot; COMPLETED</div>
+          <span class="road-status live">Shipped ✦</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Neural Policy RAG Core</h3>
+          <p style="font-size:13.5px;color:var(--muted);line-height:1.5;">
+            Cosine vector search across handbooks, deterministic grounding, and zero-hallucination citation engines.
+          </p>
+        </div>
+        <button class="vote-btn" onclick="voteRoadmap('feat_rag')" id="vote_feat_rag">
+          <span>👍 Voted (482)</span>
+        </button>
+      </div>
+
+      <div class="roadmap-card glass tilt" data-cur="ROADMAP">
+        <div class="gl"></div>
+        <div>
+          <div class="road-q">Q2 2026 &middot; NOW LIVE</div>
+          <span class="road-status live">Now Live ✦</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Dataset Engine &amp; Copilot 2.0</h3>
+          <p style="font-size:13.5px;color:var(--muted);line-height:1.5;">
+            4,653+ verified records analytics, dynamic AI suggestions, multi-language support, and 2.4-day SLA routing.
+          </p>
+        </div>
+        <button class="vote-btn" onclick="voteRoadmap('feat_dataset')" id="vote_feat_dataset">
+          <span>👍 Voted (619)</span>
+        </button>
+      </div>
+
+      <div class="roadmap-card glass tilt" data-cur="ROADMAP">
+        <div class="gl"></div>
+        <div>
+          <div class="road-q">Q3 2026 &middot; IN BETA</div>
+          <span class="road-status beta">In Beta</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Autonomous Accommodation Swarm</h3>
+          <p style="font-size:13.5px;color:var(--muted);line-height:1.5;">
+            Cross-tool dispatch into Slack, Microsoft Teams, and Jira with automated budget pre-approvals for ergonomics.
+          </p>
+        </div>
+        <button class="vote-btn" onclick="voteRoadmap('feat_swarm')" id="vote_feat_swarm">
+          <span>🗳️ Vote Feature (<span id="count_feat_swarm">289</span>)</span>
+        </button>
+      </div>
+
+      <div class="roadmap-card glass tilt" data-cur="ROADMAP">
+        <div class="gl"></div>
+        <div>
+          <div class="road-q">Q4 2026 &middot; UPCOMING</div>
+          <span class="road-status next">Upcoming</span>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Real-Time Meeting Voice Copilot</h3>
+          <p style="font-size:13.5px;color:var(--muted);line-height:1.5;">
+            Multimodal live audio captioning, interruption equalization detection, and automated neurodiversity summaries.
+          </p>
+        </div>
+        <button class="vote-btn" onclick="voteRoadmap('feat_voice')" id="vote_feat_voice">
+          <span>🗳️ Vote Feature (<span id="count_feat_voice">342</span>)</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 12 RELATABLE MOMENTS (3D CYLINDER CAROUSEL)                               -->
+  <!-- ========================================================================= -->
+  <section id="moments">
+    <div class="eyebrow">// relatable moments</div>
+    <h2>Real Feels, Zero Filter</h2>
+    <p class="sec-sub">We've all been there — the everyday workplace experiences that inspired INCLUAI.</p>
+
+    <div class="carousel">
+      <div class="ring" id="ring"></div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 13 FAQ WITH ANIMATED ACCORDION                                             -->
+  <!-- ========================================================================= -->
+  <section id="faq">
+    <div class="eyebrow">// questions &amp; answers</div>
+    <h2>Frequently Asked Questions</h2>
+    <p class="sec-sub">Everything you need to know about INCLUAI intelligence, security, and enterprise onboarding.</p>
+
+    <div class="faq-box">
+      <div class="faq-item glass open" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>How does INCLUAI guarantee zero retaliation for anonymous barrier reports?</span>
+          <i>+</i>
+        </div>
+        <div class="faq-a">
+          Our server-side architecture uses HMAC-SHA256 token scrubbing to decouple reports from session tokens, IP headers, and account identifiers before writing to the database. Even database administrators and HR leaders cannot trace an anonymous report back to an employee account.
+        </div>
+      </div>
+
+      <div class="faq-item glass" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>How does the Grounded AI Copilot prevent hallucinations?</span>
+          <i>+</i>
+        </div>
+        <div class="faq-a">
+          Unlike generic consumer chatbots, INCLUAI utilizes strict cosine similarity vector RAG across your authenticated company policy repository. If an answer cannot be grounded with at least 85% confidence in an indexed policy, the Copilot explicitly declines to guess and routes to human HR instead.
+        </div>
+      </div>
+
+      <div class="faq-item glass" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>Can INCLUAI integrate with Slack, Microsoft Teams, and Workday?</span>
+          <i>+</i>
+        </div>
+        <div class="faq-a">
+          Yes! INCLUAI provides REST APIs and webhook dispatchers that connect directly to enterprise communication hubs and HRIS platforms. Employees can interact with the Copilot or track accommodations without leaving their daily workflow.
+        </div>
+      </div>
+
+      <div class="faq-item glass" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>Is our proprietary corporate data used to train public AI models?</span>
+          <i>+</i>
+        </div>
+        <div class="faq-a">
+          Never. INCLUAI maintains strict zero-retention and zero-training policies. Your company documents, internal discussions, and employee telemetry remain completely isolated in your private enterprise tenant database.
+        </div>
+      </div>
+
+      <div class="faq-item glass" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>How is the 2.4-day accommodation SLA tracked and enforced?</span>
+          <i>+</i>
+        </div>
+        <div class="faq-a">
+          When an accommodation is requested, the system automatically creates a tracked task assigned to facilities and HR with automated SLA alerts at 24h, 48h, and 72h. Our automated telemetry dashboard alerts leadership if any barrier request risks breach.
+        </div>
+      </div>
+
+      <div class="faq-item glass" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>How long does onboarding and policy indexing take?</span>
+          <i>+</i>
+        </div>
+        <div class="faq-a">
+          Most organizations are fully operational within 24 to 48 hours. Our ingestion pipeline parses and indexes PDF manuals, Notion spaces, and Google Docs automatically with immediate vector verification.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 14 JOIN / WAITLIST & INSTANT VIP TOKEN                                    -->
+  <!-- ========================================================================= -->
+  <section id="join">
+    <div class="eyebrow">// the collective drop</div>
+    <h2>Save Your Spot In INCLUAI 2.0</h2>
+    <p class="sec-sub">Join the early VIP access tier. Generates your cryptographic session token immediately.</p>
+
+    <div class="glass join-card">
+      <div class="gl"></div>
+      <form id="vibeForm" autocomplete="off">
+        <div class="field">
+          <label class="lbl" for="vName">What do people call you</label>
+          <input class="join-input" id="vName" placeholder="e.g. Maya" required>
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="vEmail">Workplace or personal email</label>
+          <input class="join-input" id="vEmail" type="email" placeholder="you@company.com" required>
+        </div>
+
+        <div class="field">
+          <span class="lbl">Current Workplace Mood</span>
+          <div class="chips">
+            <input type="radio" name="mood" id="m1" value="running on iced coffee" checked>
+            <label for="m1" data-cur="CHOOSE">running on iced coffee</label>
+
+            <input type="radio" name="mood" id="m2" value="ready to collaborate">
+            <label for="m2" data-cur="CHOOSE">ready to collaborate</label>
+
+            <input type="radio" name="mood" id="m3" value="need to touch grass">
+            <label for="m3" data-cur="CHOOSE">need to touch grass</label>
+
+            <input type="radio" name="mood" id="m4" value="focused &amp; thriving">
+            <label for="m4" data-cur="CHOOSE">focused &amp; thriving</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="vHype">How hopeful are you today</label>
+          <div class="range-row">
+            <input type="range" id="vHype" min="0" max="100" value="85">
+            <div class="range-val" id="hypeVal">85%</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="vMsg">What's on your mind (Confidential)</label>
+          <textarea class="join-input" id="vMsg" placeholder="Share what inclusive workplace tools you need most..."></textarea>
+        </div>
+
+        <button class="btn p" id="vSubmitBtn" type="submit" data-mag data-cur="GO" style="width:100%;justify-content:center;padding:16px;">
+          <span id="vSubmitLabel">Reserve Spot &amp; Get VIP Token →</span>
+        </button>
+      </form>
+
+      <!-- Instant VIP Access Banner -->
+      <div id="waitlistSuccessBanner" style="display:none;margin-top:24px;padding:22px;border-radius:20px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.4);text-align:center;">
+        <div style="font-family:Unbounded,sans-serif;font-size:1.15rem;color:var(--b);font-weight:700;margin-bottom:6px;" id="vipSuccessTitle">
+          Spot Reserved! ✦
+        </div>
+        <p style="font-size:0.92rem;color:var(--text);margin-bottom:16px;" id="vipSuccessDesc">
+          Your cryptographic session token is active. Step inside the Workplace Platform.
+        </p>
+        <a href="/app#home" class="btn p" style="font-size:0.95rem;padding:12px 28px;text-decoration:none;">
+          <span>Enter Workplace Platform 2.0 (VIP Token Active) ↗</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Live Telemetry Ticker -->
+    <div class="telemetry-ticker" id="telemetryTicker">
+      <span>Live Early Members: <b id="statCount">248+</b></span>
+      <span>&bull;</span>
+      <span>Collective Hype: <b id="statHype">84%</b></span>
+      <span>&bull;</span>
+      <a href="/api/v2/observability/metrics" target="_blank" style="color:var(--b);text-decoration:none">Telemetry API ↗</a>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 15 PREMIUM MULTI-COLUMN ENTERPRISE FOOTER                                  -->
+  <!-- ========================================================================= -->
+  <footer class="premium-footer">
+    <div class="footer-cols">
+      <div class="footer-brand">
+        <h4>INCLUAI 2.0</h4>
+        <p>
+          The inclusive workplace intelligence platform. Grounded AI assistance, verifiable policy knowledge, cryptographic anonymity, and autonomous accessibility resolution.
+        </p>
+        <div class="status-indicator">
+          <span></span>
+          All Systems Operational &middot; 99.98% SLA
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="/app">Workplace App ↗</a></li>
+          <li><a href="/dataset.html" target="_blank">Dataset Engine (4,653) ↗</a></li>
+          <li><a href="#copilot-demo">AI Copilot Demo</a></li>
+          <li><a href="#how-it-works">Neural Pipeline</a></li>
+          <li><a href="#roadmap">Product Roadmap</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Solutions</h5>
+        <ul>
+          <li><a href="#problem-solution">Enterprise Inclusion</a></li>
+          <li><a href="#sentiment">Sentiment Telemetry</a></li>
+          <li><a href="#trust">Psychological Safety</a></li>
+          <li><a href="#accessibility">WCAG 2.2 AAA</a></li>
+          <li><a href="#impact">Resolution SLA</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Trust &amp; Legal</h5>
+        <ul>
+          <li><a href="#trust">Privacy Center</a></li>
+          <li><a href="#trust">SOC2 Type II</a></li>
+          <li><a href="#trust">Zero Retention</a></li>
+          <li><a href="/api/v2/observability/metrics" target="_blank">System Telemetry</a></li>
+          <li><a href="#faq">Security FAQ</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#testimonials">Our People</a></li>
+          <li><a href="#moments">Relatable Moments</a></li>
+          <li><a href="#join">VIP Waitlist</a></li>
+          <li><a href="/api/v2/dataset/export?format=csv">Open Data CSV</a></li>
+          <li><a href="#home">Back To Top ↑</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>&copy; 2026 INCLUAI Technologies Inc. All rights reserved. Real Feels, Zero Filter.</div>
+      <div style="display:flex;gap:20px;">
+        <a href="/app" style="color:var(--b);text-decoration:none;">Workplace Platform 2.0</a>
+        <a href="/dataset.html" target="_blank" style="color:var(--teal);text-decoration:none;">Dataset Explorer</a>
+        <a href="/api/v2/observability/metrics" target="_blank" style="color:var(--muted);text-decoration:none;">Live Health Metrics</a>
+      </div>
+    </div>
+  </footer>
+</main>
+
+<!-- ========================================================================= -->
+<!-- JAVASCRIPT: THREE.JS WEBGL + MAGNETIC CURSOR + INTERACTIVE DEMOS          -->
+<!-- ========================================================================= -->
+<!-- =====================================================================
+     MAIN JAVASCRIPT: loaded from public/app_index.js
+     Edits go there — syntax-validated separately. No template-literal escaping.
+     ===================================================================== -->
+<script src="/app_index.js"></script>
+</body>
+</html>
+`;
+
+fs.writeFileSync('public/index.html', html, 'utf8');
+fs.writeFileSync('index.html', html, 'utf8');
+console.log('Successfully generated public/index.html and index.html! Length:', html.length);

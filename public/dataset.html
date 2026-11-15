@@ -1,0 +1,2149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cyber-dark" data-lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INCLUAI 2.0 — Workforce Attrition & Intelligence Dataset</title>
+
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    /* =========================================================================
+       THEME DESIGN SYSTEM (6 DYNAMIC THEMES)
+       ========================================================================= */
+    :root, [data-theme="cyber-dark"] {
+      --bg-page: #06070a;
+      --bg-radial: radial-gradient(ellipse at 15% 10%, #2a0f5c 0%, #0b0620 45%, #03131c 100%);
+      --bg-surface: rgba(14, 16, 23, 0.78);
+      --bg-surface-elevated: rgba(22, 26, 36, 0.90);
+      --border-subtle: rgba(244, 239, 230, 0.14);
+      --border-focus: #19f0c4;
+      --text-main: #f4efe6;
+      --text-muted: rgba(244, 239, 230, 0.75);
+      --text-dim: #8d97a8;
+      --primary: #ff8a1f;
+      --primary-glow: rgba(255, 138, 31, 0.28);
+      --accent: #19f0c4;
+      --accent-glow: rgba(25, 240, 196, 0.25);
+      --danger: #ff3b5c;
+      --warning: #ffb800;
+      --success: #19f0c4;
+      --table-row-hover: rgba(25, 240, 196, 0.05);
+      --card-gradient: linear-gradient(135deg, rgba(244,239,230,.10), rgba(244,239,230,.02));
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+    }
+
+    [data-theme="obsidian"] {
+      --bg-page: #010204;
+      --bg-radial: radial-gradient(ellipse at 50% 0%, #06182c 0%, #010409 60%, #000000 100%);
+      --bg-surface: rgba(10, 15, 24, 0.85);
+      --bg-surface-elevated: rgba(16, 24, 38, 0.95);
+      --border-subtle: rgba(0, 229, 255, 0.18);
+      --border-focus: #00e5ff;
+      --text-main: #f0f6fc;
+      --text-muted: #8b949e;
+      --text-dim: #6e7681;
+      --primary: #00e5ff;
+      --primary-glow: rgba(0, 229, 255, 0.35);
+      --accent: #7c5cff;
+      --accent-glow: rgba(124, 92, 255, 0.30);
+      --danger: #f43f5e;
+      --warning: #fbbf24;
+      --success: #00e5ff;
+      --table-row-hover: rgba(0, 229, 255, 0.06);
+      --card-gradient: linear-gradient(135deg, rgba(0,229,255,.08), rgba(124,92,255,.02));
+    }
+
+    [data-theme="emerald"] {
+      --bg-page: #020f09;
+      --bg-radial: radial-gradient(ellipse at 20% 10%, #063d24 0%, #021a10 50%, #010a06 100%);
+      --bg-surface: rgba(4, 25, 16, 0.85);
+      --bg-surface-elevated: rgba(8, 38, 25, 0.95);
+      --border-subtle: rgba(0, 255, 136, 0.20);
+      --border-focus: #00ff88;
+      --text-main: #e6fcf1;
+      --text-muted: #94d3b5;
+      --text-dim: #5c997d;
+      --primary: #00ff88;
+      --primary-glow: rgba(0, 255, 136, 0.35);
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.30);
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #00ff88;
+      --table-row-hover: rgba(0, 255, 136, 0.06);
+      --card-gradient: linear-gradient(135deg, rgba(0,255,136,.09), rgba(16,185,129,.02));
+    }
+
+    [data-theme="royal"] {
+      --bg-page: #090417;
+      --bg-radial: radial-gradient(ellipse at 80% 10%, #3e1269 0%, #15082b 50%, #06020d 100%);
+      --bg-surface: rgba(22, 12, 42, 0.85);
+      --bg-surface-elevated: rgba(35, 18, 68, 0.95);
+      --border-subtle: rgba(255, 79, 216, 0.22);
+      --border-focus: #ff4fd8;
+      --text-main: #faedff;
+      --text-muted: #c9b0e3;
+      --text-dim: #8b71a8;
+      --primary: #ff4fd8;
+      --primary-glow: rgba(255, 79, 216, 0.35);
+      --accent: #8b5cf6;
+      --accent-glow: rgba(139, 92, 246, 0.30);
+      --danger: #ff2d55;
+      --warning: #ffcc00;
+      --success: #ff4fd8;
+      --table-row-hover: rgba(255, 79, 216, 0.06);
+      --card-gradient: linear-gradient(135deg, rgba(255,79,216,.10), rgba(139,92,246,.03));
+    }
+
+    [data-theme="glacier"] {
+      --bg-page: #f1f5f9;
+      --bg-radial: radial-gradient(ellipse at 50% 0%, #e2e8f0 0%, #f8fafc 60%, #eef2f6 100%);
+      --bg-surface: rgba(255, 255, 255, 0.88);
+      --bg-surface-elevated: rgba(255, 255, 255, 0.98);
+      --border-subtle: rgba(15, 23, 42, 0.12);
+      --border-focus: #0284c7;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #64748b;
+      --primary: #0284c7;
+      --primary-glow: rgba(2, 132, 199, 0.22);
+      --accent: #0ea5e9;
+      --accent-glow: rgba(14, 165, 233, 0.20);
+      --danger: #e11d48;
+      --warning: #d97706;
+      --success: #059669;
+      --table-row-hover: rgba(2, 132, 199, 0.05);
+      --card-gradient: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(241,245,249,0.8));
+    }
+
+    [data-theme="solar"] {
+      --bg-page: #100b05;
+      --bg-radial: radial-gradient(ellipse at 15% 15%, #4a2105 0%, #1c0e05 50%, #0a0603 100%);
+      --bg-surface: rgba(26, 17, 10, 0.85);
+      --bg-surface-elevated: rgba(40, 25, 14, 0.95);
+      --border-subtle: rgba(249, 115, 22, 0.22);
+      --border-focus: #f97316;
+      --text-main: #fff7ed;
+      --text-muted: #fed7aa;
+      --text-dim: #9a6845;
+      --primary: #f97316;
+      --primary-glow: rgba(249, 115, 22, 0.35);
+      --accent: #fbbf24;
+      --accent-glow: rgba(251, 191, 36, 0.30);
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --table-row-hover: rgba(249, 115, 22, 0.07);
+      --card-gradient: linear-gradient(135deg, rgba(249,115,22,.10), rgba(251,191,36,.02));
+    }
+
+    /* Base Reset & Core Styles */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-radial) fixed;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+      transition: background 0.4s ease, color 0.3s ease;
+    }
+
+    /* Ambient Glow Overlay */
+    .ambient-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(circle at 80% 20%, var(--primary-glow) 0%, transparent 40%),
+                  radial-gradient(circle at 10% 80%, var(--accent-glow) 0%, transparent 40%);
+      opacity: 0.7;
+    }
+
+    .container {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 24px 20px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Top Navigation Bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 24px;
+      background: var(--bg-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      margin-bottom: 28px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+      flex-wrap: wrap;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-logo-badge {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #000;
+      letter-spacing: 0.05em;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+    .brand-text-title {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .brand-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(25, 240, 196, 0.1);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid transparent;
+      outline: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #000;
+      box-shadow: 0 6px 20px var(--primary-glow);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px var(--primary-glow);
+    }
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: var(--border-subtle);
+      color: var(--text-main);
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--accent);
+      color: var(--text-main);
+      transform: translateY(-2px);
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .select-control {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .select-control:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* Page Hero Header */
+    .dataset-hero {
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .dataset-title {
+      font-family: 'Unbounded', sans-serif;
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+    .title-gradient {
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .dataset-subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 680px;
+    }
+    .hero-btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* KPI Metrics Cards Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .metric-card {
+      background: var(--card-gradient);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px 22px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+    .metric-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+    .metric-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      opacity: 0.8;
+    }
+    .metric-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .metric-value {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .metric-sub {
+      font-size: 12px;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+    }
+    .metric-sub.danger { color: var(--danger); }
+    .metric-sub.warning { color: var(--warning); }
+
+    /* Interactive Visual Analytics Charts Section */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+    .card {
+      background: var(--card-gradient);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+    .card-title {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 138, 31, 0.12);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    /* SVG Chart Bars */
+    .bar-row {
+      margin-bottom: 14px;
+    }
+    .bar-label-group {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 5px;
+      color: var(--text-main);
+    }
+    .bar-stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+    }
+    .bar-track {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .bar-fill.primary { background: linear-gradient(90deg, var(--primary), var(--accent)); }
+    .bar-fill.danger { background: linear-gradient(90deg, var(--danger), #ff8a1f); }
+    .bar-fill.accent { background: linear-gradient(90deg, var(--accent), #38bdf8); }
+    .bar-fill.purple { background: linear-gradient(90deg, #8b5cf6, var(--primary)); }
+
+    /* Attrition Risk Simulator Box */
+    .simulator-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .sim-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sim-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .sim-result-badge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Filter & Search Bar */
+    .filter-section {
+      background: var(--bg-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      align-items: flex-end;
+    }
+    .filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .filter-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .search-input {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 9px 14px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      outline: none;
+      width: 100%;
+      transition: all 0.2s ease;
+    }
+    .search-input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    /* Data Table Container */
+    .table-card {
+      background: var(--bg-surface);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+    }
+    .table-header-toolbar {
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .table-count-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 14px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
+      user-select: none;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    th:hover {
+      color: var(--accent);
+    }
+    td {
+      padding: 14px 18px;
+      font-size: 13.5px;
+      border-bottom: 1px solid rgba(244, 239, 230, 0.06);
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+    tr:hover td {
+      background: var(--table-row-hover);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-retained {
+      background: rgba(25, 240, 196, 0.12);
+      border: 1px solid rgba(25, 240, 196, 0.4);
+      color: var(--accent);
+    }
+    .badge-left {
+      background: rgba(255, 59, 92, 0.12);
+      border: 1px solid rgba(255, 59, 92, 0.4);
+      color: var(--danger);
+    }
+    .badge-tier {
+      background: rgba(255, 138, 31, 0.12);
+      border: 1px solid rgba(255, 138, 31, 0.35);
+      color: var(--primary);
+    }
+    .badge-benched {
+      background: rgba(255, 184, 0, 0.12);
+      border: 1px solid rgba(255, 184, 0, 0.4);
+      color: var(--warning);
+    }
+
+    /* Pagination */
+    .pagination-bar {
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-top: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+    .page-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .page-btn {
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      font-size: 13px;
+      font-family: 'Space Grotesk', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .page-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .page-btn.active {
+      background: var(--primary);
+      color: #000;
+      border-color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Modal Form */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(12px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-card {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      max-width: 540px;
+      width: 100%;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .modal-title {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .top-bar { flex-direction: column; align-items: flex-start; }
+      .nav-actions { width: 100%; justify-content: space-between; }
+      .form-grid { grid-template-columns: 1fr; }
+      .dataset-hero { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* Cinematic UI/UX Elements */
+    canvas#gl { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    .vig { position: fixed; inset: 0; z-index: 5; pointer-events: none; background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,.75) 100%); }
+    .grain { position: fixed; inset: -50%; z-index: 6; pointer-events: none; opacity: .05; animation: gr .6s steps(4) infinite; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+    @keyframes gr { 25% { transform: translate(-3%, 2%); } 50% { transform: translate(2%, -3%); } 75% { transform: translate(-2%, 3%); } }
+    .bar { position: fixed; left: 0; right: 0; height: 0; background: #000; z-index: 60; pointer-events: none; animation: lbOut 1.8s .2s cubic-bezier(.7,0,.2,1) forwards; }
+    .bar.t { top: 0; } .bar.b { bottom: 0; }
+    @keyframes lbOut { from { height: 10vh; } to { height: 0; } }
+    .cur, .dot { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); }
+    .cur { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #00e5ff; box-shadow: 0 0 18px #00e5ff; display: grid; place-items: center; font: 700 9px Unbounded; letter-spacing: 1px; color: #000; transition: width .3s, height .3s, background .3s, border-color .3s; }
+    .cur.hot { width: 76px; height: 76px; background: rgba(0,229,255,.9); border-color: transparent; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; background: #fff; }
+    .shock { position: fixed; border-radius: 50%; border: 2px solid #00e5ff; pointer-events: none; z-index: 90; transform: translate(-50%, -50%); animation: sk .9s cubic-bezier(.1,.7,.3,1) forwards; }
+    @keyframes sk { from { width: 0; height: 0; opacity: 1; } to { width: 640px; height: 640px; opacity: 0; border-width: 1px; } }
+    @media(hover:hover){ body { cursor: none; } }
+    @media(hover:none){ .cur, .dot { display: none; } }
+  </style>
+</head>
+<body>
+
+  <!-- Cinematic Background & Custom Magnetic Cursor Elements -->
+  <canvas id="gl"></canvas>
+  <div class="vig"></div>
+  <div class="grain"></div>
+  <div class="bar t"></div>
+  <div class="bar b"></div>
+  <div class="cur" id="cur"></div>
+  <div class="dot" id="dot"></div>
+
+  <div class="ambient-glow"></div>
+
+  <div class="container">
+
+    <!-- Top Navigation Header -->
+    <header class="top-bar">
+      <div class="brand-section">
+        <div class="brand-logo-badge">INCLUAI</div>
+        <div>
+          <div class="brand-text-title" data-i18n="platform_title">Workforce Dataset Engine</div>
+          <div style="font-size: 11px; color: var(--text-muted);" data-i18n="records_indexed">4,653 Verified Employee Records</div>
+        </div>
+        <span class="brand-tag">v2.0 Analytics</span>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Back to Home Button -->
+        <a href="/" class="btn btn-outline" style="border-color:rgba(255,194,74,0.35); color:var(--amber);">
+          <span>✦</span>
+          <span>Real Feels</span>
+        </a>
+
+        <!-- Back to App Button -->
+        <a href="/app" class="btn btn-outline" id="backToAppBtn">
+          <span>🏠</span>
+          <span data-i18n="open_app">Workplace App</span>
+        </a>
+
+        <!-- Theme Selector (6 Curated Themes) -->
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="font-size: 14px;">🎨</span>
+          <select id="themeSelector" class="select-control" onchange="changeTheme(this.value)" title="Choose Theme">
+            <option value="cyber-dark">Cyber Midnight</option>
+            <option value="obsidian">Obsidian OLED</option>
+            <option value="emerald">Matrix Emerald</option>
+            <option value="royal">Royal Nebula</option>
+            <option value="glacier">Glacier Crisp (Light)</option>
+            <option value="solar">Solar Amber</option>
+          </select>
+        </div>
+
+        <!-- Language Selector (6 Languages) -->
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="font-size: 14px;">🌐</span>
+          <select id="langSelector" class="select-control" onchange="changeLanguage(this.value)" title="Choose Language">
+            <option value="en">🇺🇸 English</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="hi">🇮🇳 हिन्दी</option>
+            <option value="ja">🇯🇵 日本語</option>
+          </select>
+        </div>
+
+        <!-- Add Record Button -->
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <span>+</span>
+          <span data-i18n="add_employee">Add Record</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero Header -->
+    <section class="dataset-hero">
+      <div>
+        <h1 class="dataset-title">
+          <span data-i18n="hero_title_1">Employee Retention &</span><br>
+          <span class="title-gradient" data-i18n="hero_title_2">Turnover Intelligence</span>
+        </h1>
+        <p class="dataset-subtitle" data-i18n="hero_desc">
+          High-dimensional dataset tracking education, compensation tiers, domain experience, benchmarking history, and employee retention outcomes.
+        </p>
+      </div>
+
+      <div class="hero-btn-group">
+        <button class="btn btn-outline" onclick="downloadDataset('csv')">
+          <span>📥</span>
+          <span data-i18n="export_csv">Export CSV</span>
+        </button>
+        <button class="btn btn-outline" onclick="downloadDataset('json')">
+          <span>📦</span>
+          <span data-i18n="export_json">Export JSON</span>
+        </button>
+        <a href="/app.html#analytics" class="btn btn-primary">
+          <span>📊</span>
+          <span data-i18n="view_in_app">Analyze in Workplace 2.0</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- KPI Metric Cards Grid -->
+    <section class="metrics-grid" id="kpiMetrics">
+      <div class="metric-card">
+        <div class="metric-label">
+          <span data-i18n="kpi_total">Total Employees</span>
+          <span>👥</span>
+        </div>
+        <div class="metric-value" id="statTotal">4,653</div>
+        <div class="metric-sub" data-i18n="kpi_total_sub">100% verified records</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">
+          <span data-i18n="kpi_retention">Retention Rate</span>
+          <span>🛡️</span>
+        </div>
+        <div class="metric-value" id="statRetention">65.7%</div>
+        <div class="metric-sub" id="statRetainedCount">3,053 retained</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">
+          <span data-i18n="kpi_attrition">Turnover Rate</span>
+          <span>🚪</span>
+        </div>
+        <div class="metric-value" id="statAttrition" style="color:var(--danger);">34.3%</div>
+        <div class="metric-sub danger" id="statLeftCount">1,600 departures</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">
+          <span data-i18n="kpi_age">Average Age</span>
+          <span>🎂</span>
+        </div>
+        <div class="metric-value" id="statAvgAge">29.4 <span style="font-size:16px;">yrs</span></div>
+        <div class="metric-sub" data-i18n="kpi_age_sub">Span: 22 - 41 yrs</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">
+          <span data-i18n="kpi_exp">Domain Experience</span>
+          <span>⚡</span>
+        </div>
+        <div class="metric-value" id="statAvgExp">2.9 <span style="font-size:16px;">yrs</span></div>
+        <div class="metric-sub" data-i18n="kpi_exp_sub">Span: 0 - 7 yrs</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">
+          <span data-i18n="kpi_bench">Bench Ratio</span>
+          <span>⏳</span>
+        </div>
+        <div class="metric-value" id="statBenchRate">10.3%</div>
+        <div class="metric-sub warning" id="statBenchCount">477 ever benched</div>
+      </div>
+    </section>
+
+    <!-- Visual Charts & Predictive Risk Simulator -->
+    <section class="charts-grid">
+      <!-- Chart 1: City Breakdown & Turnover -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🏙️</span>
+            <span data-i18n="chart_city">Turnover by Hub City</span>
+          </div>
+          <span class="card-badge" data-i18n="badge_geo">Regional Split</span>
+        </div>
+        <div id="cityChartContainer">
+          <!-- Rendered via JS -->
+          <div class="bar-row">
+            <div class="bar-label-group">
+              <span>Bangalore</span>
+              <span class="bar-stat-val">26.7% turnover (2,228 total)</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill primary" style="width: 26.7%;"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label-group">
+              <span>Pune</span>
+              <span class="bar-stat-val">50.4% turnover (1,268 total)</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill danger" style="width: 50.4%;"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label-group">
+              <span>New Delhi</span>
+              <span class="bar-stat-val">31.6% turnover (1,157 total)</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill accent" style="width: 31.6%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart 2: Education & Attrition -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🎓</span>
+            <span data-i18n="chart_edu">Turnover by Education</span>
+          </div>
+          <span class="card-badge" data-i18n="badge_degrees">Academic Level</span>
+        </div>
+        <div id="eduChartContainer">
+          <div class="bar-row">
+            <div class="bar-label-group">
+              <span>Bachelors</span>
+              <span class="bar-stat-val">31.4% turnover (3,601 total)</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill primary" style="width: 31.4%;"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label-group">
+              <span>Masters</span>
+              <span class="bar-stat-val">48.8% turnover (873 total)</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill danger" style="width: 48.8%;"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label-group">
+              <span>PHD</span>
+              <span class="bar-stat-val">25.1% turnover (179 total)</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill accent" style="width: 25.1%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart 3: Payment Tier Impact -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>💳</span>
+            <span data-i18n="chart_tier">Payment Tier Impact</span>
+          </div>
+          <span class="card-badge" data-i18n="badge_comp">Compensation</span>
+        </div>
+        <div id="tierChartContainer">
+          <div class="bar-row">
+            <div class="bar-label-group">
+              <span>Tier 1 (Highest Executive)</span>
+              <span class="bar-stat-val">36.6% turnover (243 total)</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill accent" style="width: 36.6%;"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label-group">
+              <span>Tier 2 (Mid-Level)</span>
+              <span class="bar-stat-val">59.9% turnover (918 total)</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill danger" style="width: 59.9%;"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label-group">
+              <span>Tier 3 (Entry / Standard)</span>
+              <span class="bar-stat-val">27.5% turnover (3,492 total)</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill primary" style="width: 27.5%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Attrition Risk Predictor Simulator -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🔮</span>
+            <span data-i18n="sim_title">AI Turnover Risk Simulator</span>
+          </div>
+          <span class="card-badge" data-i18n="sim_badge">Real-time Predictor</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;" data-i18n="sim_desc">
+          Test candidate attributes to estimate retention probability based on our 4,653 employee historical model.
+        </p>
+
+        <div class="simulator-box">
+          <div class="sim-field">
+            <label class="sim-label" data-i18n="col_edu">Education</label>
+            <select id="simEdu" class="select-control" onchange="runSimulation()">
+              <option value="Bachelors">Bachelors</option>
+              <option value="Masters">Masters</option>
+              <option value="PHD">PHD</option>
+            </select>
+          </div>
+          <div class="sim-field">
+            <label class="sim-label" data-i18n="col_city">City</label>
+            <select id="simCity" class="select-control" onchange="runSimulation()">
+              <option value="Bangalore">Bangalore</option>
+              <option value="Pune" selected>Pune</option>
+              <option value="New Delhi">New Delhi</option>
+            </select>
+          </div>
+          <div class="sim-field">
+            <label class="sim-label" data-i18n="col_tier">Payment Tier</label>
+            <select id="simTier" class="select-control" onchange="runSimulation()">
+              <option value="1">Tier 1 (High)</option>
+              <option value="2" selected>Tier 2 (Mid)</option>
+              <option value="3">Tier 3 (Standard)</option>
+            </select>
+          </div>
+          <div class="sim-field">
+            <label class="sim-label" data-i18n="col_benched">Ever Benched</label>
+            <select id="simBenched" class="select-control" onchange="runSimulation()">
+              <option value="No">No</option>
+              <option value="Yes" selected>Yes</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sim-result-badge" id="simResultBox">
+          <div>
+            <div style="font-size: 12px; color: var(--text-muted);" data-i18n="sim_prob_label">Estimated Departure Risk</div>
+            <div style="font-family:'Unbounded', sans-serif; font-size:24px; font-weight:800; color:var(--danger);" id="simPercentage">78% Risk</div>
+          </div>
+          <div style="text-align: right; max-width: 240px;">
+            <div style="font-size:12px; font-weight:700; color:var(--danger);" id="simRiskLevel">Critical High</div>
+            <div style="font-size:11px; color:var(--text-muted);" id="simRec">Review compensation tier and domain alignment.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter & Search Controls -->
+    <section class="filter-section">
+      <div class="filter-grid">
+        <div class="filter-field" style="grid-column: span 2;">
+          <label class="filter-label" data-i18n="search_label">Search Records</label>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search by ID, Education, City, Gender, Year..." oninput="handleSearch()">
+        </div>
+
+        <div class="filter-field">
+          <label class="filter-label" data-i18n="filter_edu">Education</label>
+          <select id="filterEdu" class="select-control" onchange="applyFilters()">
+            <option value="All">All Education</option>
+            <option value="Bachelors">Bachelors</option>
+            <option value="Masters">Masters</option>
+            <option value="PHD">PHD</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label class="filter-label" data-i18n="filter_city">City</label>
+          <select id="filterCity" class="select-control" onchange="applyFilters()">
+            <option value="All">All Cities</option>
+            <option value="Bangalore">Bangalore</option>
+            <option value="Pune">Pune</option>
+            <option value="New Delhi">New Delhi</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label class="filter-label" data-i18n="filter_tier">Payment Tier</label>
+          <select id="filterTier" class="select-control" onchange="applyFilters()">
+            <option value="All">All Tiers</option>
+            <option value="1">Tier 1</option>
+            <option value="2">Tier 2</option>
+            <option value="3">Tier 3</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label class="filter-label" data-i18n="filter_gender">Gender</label>
+          <select id="filterGender" class="select-control" onchange="applyFilters()">
+            <option value="All">All Genders</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label class="filter-label" data-i18n="filter_benched">Ever Benched</label>
+          <select id="filterBenched" class="select-control" onchange="applyFilters()">
+            <option value="All">All Status</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label class="filter-label" data-i18n="filter_status">Outcome</label>
+          <select id="filterLeave" class="select-control" onchange="applyFilters()">
+            <option value="All">All Outcomes</option>
+            <option value="0">Retained (Stayed)</option>
+            <option value="1">Left (Turnover)</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <button class="btn btn-outline" onclick="resetFilters()" style="width: 100%;">
+            <span>🔄</span>
+            <span data-i18n="reset_filters">Reset Filters</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Data Table Card -->
+    <section class="table-card">
+      <div class="table-header-toolbar">
+        <div>
+          <span class="table-count-label" id="tableRecordSummary">Showing 1–25 of 4,653 employees</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 13px; color: var(--text-dim);" data-i18n="per_page">Per Page:</span>
+          <select id="pageSizeSelect" class="select-control" onchange="changePageSize(this.value)">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="sortTable('id')"># ID ⬍</th>
+              <th onclick="sortTable('Education')" data-i18n="col_edu">Education ⬍</th>
+              <th onclick="sortTable('JoiningYear')" data-i18n="col_year">Joining Year ⬍</th>
+              <th onclick="sortTable('City')" data-i18n="col_city">Hub City ⬍</th>
+              <th onclick="sortTable('PaymentTier')" data-i18n="col_tier">Payment Tier ⬍</th>
+              <th onclick="sortTable('Age')" data-i18n="col_age">Age ⬍</th>
+              <th onclick="sortTable('Gender')" data-i18n="col_gender">Gender ⬍</th>
+              <th onclick="sortTable('EverBenched')" data-i18n="col_benched">Benched ⬍</th>
+              <th onclick="sortTable('ExperienceInCurrentDomain')" data-i18n="col_exp">Domain Exp ⬍</th>
+              <th onclick="sortTable('LeaveOrNot')" data-i18n="col_outcome">Status Outcome ⬍</th>
+            </tr>
+          </thead>
+          <tbody id="datasetTableBody">
+            <!-- Dynamically Rendered -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Footer -->
+      <div class="pagination-bar">
+        <div style="font-size: 13px; color: var(--text-muted);" id="paginationInfo">
+          Page 1 of 187
+        </div>
+        <div class="page-controls">
+          <button class="page-btn" id="btnPrev" onclick="changePage(-1)" disabled data-i18n="btn_prev">‹ Previous</button>
+          <div id="pageNumberButtons" style="display: flex; gap: 4px;"></div>
+          <button class="page-btn" id="btnNext" onclick="changePage(1)" data-i18n="btn_next">Next ›</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Add Record Modal -->
+  <div class="modal-backdrop" id="addRecordModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="modal_add_title">Add Employee Record</h3>
+        <button class="close-btn" onclick="closeAddModal()">&times;</button>
+      </div>
+
+      <form id="addRecordForm" onsubmit="submitNewRecord(event)">
+        <div class="form-grid">
+          <div class="sim-field">
+            <label class="sim-label" data-i18n="col_edu">Education</label>
+            <select id="newEdu" class="select-control" required>
+              <option value="Bachelors">Bachelors</option>
+              <option value="Masters">Masters</option>
+              <option value="PHD">PHD</option>
+            </select>
+          </div>
+
+          <div class="sim-field">
+            <label class="sim-label" data-i18n="col_year">Joining Year</label>
+            <input type="number" id="newYear" class="search-input" value="2018" min="2010" max="2026" required>
+          </div>
+
+          <div class="sim-field">
+            <label class="sim-label" data-i18n="col_city">Hub City</label>
+            <select id="newCity" class="select-control" required>
+              <option value="Bangalore">Bangalore</option>
+              <option value="Pune">Pune</option>
+              <option value="New Delhi">New Delhi</option>
+            </select>
+          </div>
+
+          <div class="sim-field">
+            <label class="sim-label" data-i18n="col_tier">Payment Tier</label>
+            <select id="newTier" class="select-control" required>
+              <option value="1">Tier 1 (High)</option>
+              <option value="2">Tier 2 (Mid)</option>
+              <option value="3" selected>Tier 3 (Standard)</option>
+            </select>
+          </div>
+
+          <div class="sim-field">
+            <label class="sim-label" data-i18n="col_age">Age</label>
+            <input type="number" id="newAge" class="search-input" value="27" min="18" max="70" required>
+          </div>
+
+          <div class="sim-field">
+            <label class="sim-label" data-i18n="col_gender">Gender</label>
+            <select id="newGender" class="select-control" required>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+
+          <div class="sim-field">
+            <label class="sim-label" data-i18n="col_benched">Ever Benched?</label>
+            <select id="newBenched" class="select-control" required>
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+            </select>
+          </div>
+
+          <div class="sim-field">
+            <label class="sim-label" data-i18n="col_exp">Experience (Years)</label>
+            <input type="number" id="newExp" class="search-input" value="3" min="0" max="20" required>
+          </div>
+
+          <div class="sim-field" style="grid-column: span 2;">
+            <label class="sim-label" data-i18n="col_outcome">Attrition Outcome</label>
+            <select id="newLeave" class="select-control" required>
+              <option value="0">Retained (Stayed with Company)</option>
+              <option value="1">Left (Turnover / Resigned)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+          <button type="button" class="btn btn-outline" onclick="closeAddModal()" data-i18n="btn_cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" data-i18n="btn_save">Save Employee Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Client-Side Engine & Internationalization Logic -->
+  <script>
+    // Translations Dictionary
+    const I18N = {
+      en: {
+        platform_title: "Workforce Dataset Engine",
+        records_indexed: "4,653 Verified Employee Records",
+        open_app: "Open Workplace App",
+        add_employee: "Add Record",
+        hero_title_1: "Employee Retention &",
+        hero_title_2: "Turnover Intelligence",
+        hero_desc: "High-dimensional dataset tracking education, compensation tiers, domain experience, benchmarking history, and employee retention outcomes.",
+        export_csv: "Export CSV",
+        export_json: "Export JSON",
+        view_in_app: "Analyze in Workplace 2.0",
+        kpi_total: "Total Employees",
+        kpi_total_sub: "100% verified records",
+        kpi_retention: "Retention Rate",
+        kpi_attrition: "Turnover Rate",
+        kpi_age: "Average Age",
+        kpi_age_sub: "Span: 22 - 41 yrs",
+        kpi_exp: "Domain Experience",
+        kpi_exp_sub: "Span: 0 - 7 yrs",
+        kpi_bench: "Bench Ratio",
+        chart_city: "Turnover by Hub City",
+        badge_geo: "Regional Split",
+        chart_edu: "Turnover by Education",
+        badge_degrees: "Academic Level",
+        chart_tier: "Payment Tier Impact",
+        badge_comp: "Compensation",
+        sim_title: "AI Turnover Risk Simulator",
+        sim_badge: "Real-time Predictor",
+        sim_desc: "Test candidate attributes to estimate retention probability based on our 4,653 employee historical model.",
+        sim_prob_label: "Estimated Departure Risk",
+        search_label: "Search Records",
+        filter_edu: "Education",
+        filter_city: "City",
+        filter_tier: "Payment Tier",
+        filter_gender: "Gender",
+        filter_benched: "Ever Benched",
+        filter_status: "Outcome",
+        reset_filters: "Reset Filters",
+        per_page: "Per Page:",
+        col_edu: "Education",
+        col_year: "Joining Year",
+        col_city: "Hub City",
+        col_tier: "Payment Tier",
+        col_age: "Age",
+        col_gender: "Gender",
+        col_benched: "Benched",
+        col_exp: "Domain Exp",
+        col_outcome: "Status Outcome",
+        btn_prev: "‹ Previous",
+        btn_next: "Next ›",
+        modal_add_title: "Add Employee Record",
+        btn_cancel: "Cancel",
+        btn_save: "Save Employee Record"
+      },
+      es: {
+        platform_title: "Motor de Datos de Empleados",
+        records_indexed: "4.653 Registros Verificados",
+        open_app: "Abrir Plataforma",
+        add_employee: "Agregar Registro",
+        hero_title_1: "Retención de Personal &",
+        hero_title_2: "Inteligencia de Rotación",
+        hero_desc: "Conjunto de datos multidimensional que rastrea educación, salarios, experiencia y retención laboral.",
+        export_csv: "Exportar CSV",
+        export_json: "Exportar JSON",
+        view_in_app: "Analizar en Workplace 2.0",
+        kpi_total: "Total Empleados",
+        kpi_total_sub: "100% datos verificados",
+        kpi_retention: "Tasa de Retención",
+        kpi_attrition: "Tasa de Rotación",
+        kpi_age: "Edad Promedio",
+        kpi_age_sub: "Rango: 22 - 41 años",
+        kpi_exp: "Experiencia de Dominio",
+        kpi_exp_sub: "Rango: 0 - 7 años",
+        kpi_bench: "Ratio en Espera",
+        chart_city: "Rotación por Ciudad",
+        badge_geo: "División Regional",
+        chart_edu: "Rotación por Educación",
+        badge_degrees: "Nivel Académico",
+        chart_tier: "Impacto del Nivel Salarial",
+        badge_comp: "Compensación",
+        sim_title: "Simulador de Riesgo con IA",
+        sim_badge: "Predictor en Vivo",
+        sim_desc: "Pruebe atributos para estimar la probabilidad de retención según 4.653 registros históricos.",
+        sim_prob_label: "Riesgo Estimado de Renuncia",
+        search_label: "Buscar Registros",
+        filter_edu: "Educación",
+        filter_city: "Ciudad",
+        filter_tier: "Nivel Salarial",
+        filter_gender: "Género",
+        filter_benched: "En Espera",
+        filter_status: "Resultado",
+        reset_filters: "Restablecer Filtros",
+        per_page: "Por Página:",
+        col_edu: "Educación",
+        col_year: "Año de Ingreso",
+        col_city: "Ciudad",
+        col_tier: "Nivel Salarial",
+        col_age: "Edad",
+        col_gender: "Género",
+        col_benched: "En Espera",
+        col_exp: "Experiencia",
+        col_outcome: "Estado",
+        btn_prev: "‹ Anterior",
+        btn_next: "Siguiente ›",
+        modal_add_title: "Agregar Registro de Empleado",
+        btn_cancel: "Cancelar",
+        btn_save: "Guardar Registro"
+      },
+      fr: {
+        platform_title: "Moteur de Données Salariés",
+        records_indexed: "4 653 Dossiers Vérifiés",
+        open_app: "Ouvrir l'Application",
+        add_employee: "Ajouter Enregistrement",
+        hero_title_1: "Rétention & Intelligence",
+        hero_title_2: "Du Turnover Salarié",
+        hero_desc: "Jeu de données analysant la formation, les grilles salariales, l'expérience et le maintien des effectifs.",
+        export_csv: "Exporter CSV",
+        export_json: "Exporter JSON",
+        view_in_app: "Analyser dans Workplace 2.0",
+        kpi_total: "Total Employés",
+        kpi_total_sub: "100% dossiers vérifiés",
+        kpi_retention: "Taux de Rétention",
+        kpi_attrition: "Taux de Turnover",
+        kpi_age: "Âge Moyen",
+        kpi_age_sub: "Intervalle: 22 - 41 ans",
+        kpi_exp: "Expérience Domaine",
+        kpi_exp_sub: "Intervalle: 0 - 7 ans",
+        kpi_bench: "Taux en Attente",
+        chart_city: "Turnover par Ville",
+        badge_geo: "Répartition Géographique",
+        chart_edu: "Turnover par Niveau d'Études",
+        badge_degrees: "Niveau Académique",
+        chart_tier: "Impact Grille Salaire",
+        badge_comp: "Rémunération",
+        sim_title: "Simulateur de Risque IA",
+        sim_badge: "Prédicteur en Temps Réel",
+        sim_desc: "Estimez le risque de départ basé sur notre historique de 4 653 collaborateurs.",
+        sim_prob_label: "Risque de Départ Estimé",
+        search_label: "Rechercher",
+        filter_edu: "Formation",
+        filter_city: "Ville",
+        filter_tier: "Grille Salaire",
+        filter_gender: "Genre",
+        filter_benched: "En Attente",
+        filter_status: "Statut",
+        reset_filters: "Réinitialiser",
+        per_page: "Par Page:",
+        col_edu: "Formation",
+        col_year: "Année d'Embauche",
+        col_city: "Ville",
+        col_tier: "Grille",
+        col_age: "Âge",
+        col_gender: "Genre",
+        col_benched: "Attente",
+        col_exp: "Expérience",
+        col_outcome: "Statut",
+        btn_prev: "‹ Précédent",
+        btn_next: "Suivant ›",
+        modal_add_title: "Ajouter un Collaborateur",
+        btn_cancel: "Annuler",
+        btn_save: "Enregistrer"
+      },
+      de: {
+        platform_title: "Mitarbeiterdaten-Engine",
+        records_indexed: "4.653 Verifizierte Datensätze",
+        open_app: "Arbeitsplatz-App Öffnen",
+        add_employee: "Datensatz Hinzufügen",
+        hero_title_1: "Mitarbeiterbindung &",
+        hero_title_2: "Fluktuationsanalyse",
+        hero_desc: "Hochdimensionaler Datensatz zu Bildung, Gehaltsstufen, Domänenerfahrung und Fluktuation.",
+        export_csv: "CSV Exportieren",
+        export_json: "JSON Exportieren",
+        view_in_app: "In Workplace 2.0 Analysieren",
+        kpi_total: "Gesamtmitarbeiter",
+        kpi_total_sub: "100% geprüfte Daten",
+        kpi_retention: "Bindungsrate",
+        kpi_attrition: "Fluktuationsrate",
+        kpi_age: "Durchschnittsalter",
+        kpi_age_sub: "Bereich: 22 - 41 J.",
+        kpi_exp: "Domänenerfahrung",
+        kpi_exp_sub: "Bereich: 0 - 7 J.",
+        kpi_bench: "Bereitschaftsquote",
+        chart_city: "Fluktuation nach Stadt",
+        badge_geo: "Regionalverteilung",
+        chart_edu: "Fluktuation nach Bildung",
+        badge_degrees: "Akademischer Grad",
+        chart_tier: "Einfluss der Gehaltsstufe",
+        badge_comp: "Vergütung",
+        sim_title: "KI-Fluktuationsrisiko-Simulator",
+        sim_badge: "Echtzeit-Prädiktor",
+        sim_desc: "Testen Sie Mitarbeiterattribute zur Prognose der Wechselwahrscheinlichkeit.",
+        sim_prob_label: "Geschätztes Abgangsrisiko",
+        search_label: "Datensätze Suchen",
+        filter_edu: "Bildung",
+        filter_city: "Stadt",
+        filter_tier: "Gehaltsstufe",
+        filter_gender: "Geschlecht",
+        filter_benched: "Bereitschaft",
+        filter_status: "Ergebnis",
+        reset_filters: "Filter Zurücksetzen",
+        per_page: "Pro Seite:",
+        col_edu: "Bildung",
+        col_year: "Eintrittsjahr",
+        col_city: "Stadt",
+        col_tier: "Gehaltsstufe",
+        col_age: "Alter",
+        col_gender: "Geschlecht",
+        col_benched: "Bereitschaft",
+        col_exp: "Erfahrung",
+        col_outcome: "Status",
+        btn_prev: "‹ Zurück",
+        btn_next: "Weiter ›",
+        modal_add_title: "Mitarbeiter Hinzufügen",
+        btn_cancel: "Abbrechen",
+        btn_save: "Speichern"
+      },
+      hi: {
+        platform_title: "कर्मचारी डेटासेट इंजन",
+        records_indexed: "4,653 सत्यापित कर्मचारी रिकॉर्ड",
+        open_app: "वर्कप्लेस ऐप खोलें",
+        add_employee: "नया रिकॉर्ड जोड़ें",
+        hero_title_1: "कर्मचारी प्रतिधारण एवं",
+        hero_title_2: "एट्रिशन इंटेलिजेंस",
+        hero_desc: "शिक्षा, वेतन स्तर, कार्य अनुभव और कर्मचारी प्रतिधारण का बहुआयामी डेटासेट।",
+        export_csv: "CSV डाउनलोड",
+        export_json: "JSON डाउनलोड",
+        view_in_app: "वर्कप्लेस 2.0 में देखें",
+        kpi_total: "कुल कर्मचारी",
+        kpi_total_sub: "100% सत्यापित डेटा",
+        kpi_retention: "प्रतिधारण दर (Retention)",
+        kpi_attrition: "एट्रिशन दर (Turnover)",
+        kpi_age: "औसत आयु",
+        kpi_age_sub: "विस्तार: 22 - 41 वर्ष",
+        kpi_exp: "औसत अनुभव",
+        kpi_exp_sub: "विस्तार: 0 - 7 वर्ष",
+        kpi_bench: "बेंच अनुपात",
+        chart_city: "शहर अनुसार एट्रिशन",
+        badge_geo: "क्षेत्रीय विभाजन",
+        chart_edu: "शिक्षा अनुसार एट्रिशन",
+        badge_degrees: "शैक्षणिक स्तर",
+        chart_tier: "वेतन स्तर का प्रभाव",
+        badge_comp: "मुआवजा",
+        sim_title: "AI एट्रिशन जोखिम सिम्युलेटर",
+        sim_badge: "रीयल-टाइम प्रेडिक्टर",
+        sim_desc: "4,653 ऐतिहासिक रिकॉर्ड के आधार पर कंपनी छोड़ने के जोखिम का पूर्वानुमान लगाएं।",
+        sim_prob_label: "अनुमानित प्रस्थान जोखिम",
+        search_label: "रिकॉर्ड खोजें",
+        filter_edu: "शिक्षा",
+        filter_city: "शहर",
+        filter_tier: "वेतन स्तर",
+        filter_gender: "लिंग",
+        filter_benched: "बेंच स्थिति",
+        filter_status: "परिणाम",
+        reset_filters: "फ़िल्टर रीसेट करें",
+        per_page: "प्रति पृष्ठ:",
+        col_edu: "शिक्षा",
+        col_year: "शामिल होने का वर्ष",
+        col_city: "हब शहर",
+        col_tier: "वेतन स्तर",
+        col_age: "आयु",
+        col_gender: "लिंग",
+        col_benched: "बेंच",
+        col_exp: "अनुभव",
+        col_outcome: "स्थिति",
+        btn_prev: "‹ पिछला",
+        btn_next: "अगला ›",
+        modal_add_title: "कर्मचारी रिकॉर्ड जोड़ें",
+        btn_cancel: "रद्द करें",
+        btn_save: "सहेजें"
+      },
+      ja: {
+        platform_title: "従業員データセットエンジン",
+        records_indexed: "4,653件の検証済み記録",
+        open_app: "アプリを開く",
+        add_employee: "レコード追加",
+        hero_title_1: "従業員定着率と",
+        hero_title_2: "離職インテリジェンス",
+        hero_desc: "学歴、給与階層、実務経験、ベンチ状況、離職傾向を網羅した高次元データセット。",
+        export_csv: "CSVエクスポート",
+        export_json: "JSONエクスポート",
+        view_in_app: "Workplace 2.0で分析",
+        kpi_total: "総従業員数",
+        kpi_total_sub: "100%検証済みデータ",
+        kpi_retention: "定着率 (Retention)",
+        kpi_attrition: "離職率 (Turnover)",
+        kpi_age: "平均年齢",
+        kpi_age_sub: "範囲: 22 - 41歳",
+        kpi_exp: "平均実務年数",
+        kpi_exp_sub: "範囲: 0 - 7年",
+        kpi_bench: "ベンチ待機率",
+        chart_city: "都市別離職率",
+        badge_geo: "地域別",
+        chart_edu: "学歴別離職率",
+        badge_degrees: "学位階層",
+        chart_tier: "給与階層の影響",
+        badge_comp: "報酬",
+        sim_title: "AI離職リスクシミュレーター",
+        sim_badge: "リアルタイム予測",
+        sim_desc: "4,653件の実績データに基づき離職確率をシミュレーションします。",
+        sim_prob_label: "推定離職リスク",
+        search_label: "レコード検索",
+        filter_edu: "学歴",
+        filter_city: "拠点都市",
+        filter_tier: "給与階層",
+        filter_gender: "性別",
+        filter_benched: "ベンチ待機",
+        filter_status: "結果",
+        reset_filters: "リセット",
+        per_page: "表示件数:",
+        col_edu: "学歴",
+        col_year: "入社年",
+        col_city: "都市",
+        col_tier: "給与階層",
+        col_age: "年齢",
+        col_gender: "性別",
+        col_benched: "ベンチ",
+        col_exp: "実務経験",
+        col_outcome: "ステータス",
+        btn_prev: "‹ 前へ",
+        btn_next: "次へ ›",
+        modal_add_title: "従業員レコードを追加",
+        btn_cancel: "キャンセル",
+        btn_save: "保存する"
+      }
+    };
+
+    // State
+    let dataset = [];
+    let filteredRecords = [];
+    let currentPage = 1;
+    let pageSize = 25;
+    let currentSort = { col: 'id', order: 'asc' };
+    let currentLang = localStorage.getItem('incluai_lang') || 'en';
+    let currentTheme = localStorage.getItem('incluai_theme') || 'cyber-dark';
+
+    // Theme Switcher Logic
+    function changeTheme(themeId) {
+      currentTheme = themeId;
+      document.documentElement.setAttribute('data-theme', themeId);
+      localStorage.setItem('incluai_theme', themeId);
+      document.getElementById('themeSelector').value = themeId;
+      
+      // Sync with backend if user has token
+      const token = localStorage.getItem('token');
+      if (token) {
+        fetch('/api/v2/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ theme: themeId })
+        }).catch(e => console.log('Backend theme sync skipped'));
+      }
+    }
+
+    // Language Switcher Logic
+    function changeLanguage(langCode) {
+      if (!I18N[langCode]) langCode = 'en';
+      currentLang = langCode;
+      document.documentElement.setAttribute('data-lang', langCode);
+      localStorage.setItem('incluai_lang', langCode);
+      document.getElementById('langSelector').value = langCode;
+
+      // Update UI texts
+      const dict = I18N[langCode];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+          el.innerText = dict[key];
+        }
+      });
+
+      renderTable();
+      runSimulation();
+
+      // Sync with backend
+      const token = localStorage.getItem('token');
+      if (token) {
+        fetch('/api/v2/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ language: langCode })
+        }).catch(e => console.log('Backend lang sync skipped'));
+      }
+    }
+
+    // Load Data
+    async function initDataset() {
+      // Restore theme & lang
+      changeTheme(currentTheme);
+      changeLanguage(currentLang);
+
+      try {
+        // Fetch full dataset from API or static mirror
+        let res = await fetch('/api/v2/dataset?limit=all');
+        if (!res.ok) {
+          res = await fetch('/data/employee_attrition.json');
+        }
+        const data = await res.json();
+        dataset = Array.isArray(data) ? data : (data.data || []);
+        filteredRecords = [...dataset];
+
+        // Fetch live stats
+        fetchStats();
+        renderTable();
+        runSimulation();
+      } catch (err) {
+        console.error('Failed to load dataset:', err);
+      }
+    }
+
+    // Fetch Stats from API
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/v2/dataset/stats');
+        const json = await res.json();
+        if (json.success && json.stats) {
+          const s = json.stats;
+          document.getElementById('statTotal').innerText = s.totalRecords.toLocaleString();
+          document.getElementById('statRetention').innerText = s.retentionRate + '%';
+          document.getElementById('statRetainedCount').innerText = s.retainedCount.toLocaleString() + ' retained';
+          document.getElementById('statAttrition').innerText = s.attritionRate + '%';
+          document.getElementById('statLeftCount').innerText = s.leftCount.toLocaleString() + ' departures';
+          document.getElementById('statAvgAge').innerHTML = s.avgAge + ' <span style="font-size:16px;">yrs</span>';
+          document.getElementById('statAvgExp').innerHTML = s.avgExperience + ' <span style="font-size:16px;">yrs</span>';
+          document.getElementById('statBenchRate').innerText = s.benchedRate + '%';
+          document.getElementById('statBenchCount').innerText = s.benchedCount.toLocaleString() + ' ever benched';
+
+          renderCharts(s);
+        }
+      } catch (e) {
+        console.log('Stats calculation fallback');
+      }
+    }
+
+    function renderCharts(stats) {
+      if (stats.byCity) {
+        let cityHtml = '';
+        for (const [city, data] of Object.entries(stats.byCity)) {
+          const fillClass = data.rate > 40 ? 'danger' : (data.rate > 30 ? 'primary' : 'accent');
+          cityHtml += `
+            <div class="bar-row">
+              <div class="bar-label-group">
+                <span>${city}</span>
+                <span class="bar-stat-val">${data.rate}% turnover (${data.total.toLocaleString()} total)</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill ${fillClass}" style="width: ${data.rate}%;"></div></div>
+            </div>
+          `;
+        }
+        document.getElementById('cityChartContainer').innerHTML = cityHtml;
+      }
+
+      if (stats.byEducation) {
+        let eduHtml = '';
+        for (const [edu, data] of Object.entries(stats.byEducation)) {
+          const fillClass = data.rate > 40 ? 'danger' : 'primary';
+          eduHtml += `
+            <div class="bar-row">
+              <div class="bar-label-group">
+                <span>${edu}</span>
+                <span class="bar-stat-val">${data.rate}% turnover (${data.total.toLocaleString()} total)</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill ${fillClass}" style="width: ${data.rate}%;"></div></div>
+            </div>
+          `;
+        }
+        document.getElementById('eduChartContainer').innerHTML = eduHtml;
+      }
+
+      if (stats.byPaymentTier) {
+        let tierHtml = '';
+        for (const [tier, data] of Object.entries(stats.byPaymentTier)) {
+          const fillClass = data.rate > 45 ? 'danger' : 'accent';
+          tierHtml += `
+            <div class="bar-row">
+              <div class="bar-label-group">
+                <span>${tier}</span>
+                <span class="bar-stat-val">${data.rate}% turnover (${data.total.toLocaleString()} total)</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill ${fillClass}" style="width: ${data.rate}%;"></div></div>
+            </div>
+          `;
+        }
+        document.getElementById('tierChartContainer').innerHTML = tierHtml;
+      }
+    }
+
+    // Filter Logic
+    function applyFilters() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const edu = document.getElementById('filterEdu').value;
+      const city = document.getElementById('filterCity').value;
+      const tier = document.getElementById('filterTier').value;
+      const gender = document.getElementById('filterGender').value;
+      const benched = document.getElementById('filterBenched').value;
+      const leave = document.getElementById('filterLeave').value;
+
+      filteredRecords = dataset.filter(r => {
+        if (q) {
+          const match = r.id.toString().includes(q) ||
+            r.Education.toLowerCase().includes(q) ||
+            r.City.toLowerCase().includes(q) ||
+            r.Gender.toLowerCase().includes(q) ||
+            r.JoiningYear.toString().includes(q);
+          if (!match) return false;
+        }
+        if (edu !== 'All' && r.Education !== edu) return false;
+        if (city !== 'All' && r.City !== city) return false;
+        if (tier !== 'All' && r.PaymentTier !== parseInt(tier, 10)) return false;
+        if (gender !== 'All' && r.Gender !== gender) return false;
+        if (benched !== 'All' && r.EverBenched.toLowerCase() !== benched.toLowerCase()) return false;
+        if (leave !== 'All' && r.LeaveOrNot !== parseInt(leave, 10)) return false;
+        return true;
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    function handleSearch() {
+      applyFilters();
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('filterEdu').value = 'All';
+      document.getElementById('filterCity').value = 'All';
+      document.getElementById('filterTier').value = 'All';
+      document.getElementById('filterGender').value = 'All';
+      document.getElementById('filterBenched').value = 'All';
+      document.getElementById('filterLeave').value = 'All';
+      filteredRecords = [...dataset];
+      currentPage = 1;
+      renderTable();
+    }
+
+    // Sorting
+    function sortTable(column) {
+      if (currentSort.col === column) {
+        currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSort.col = column;
+        currentSort.order = 'asc';
+      }
+
+      filteredRecords.sort((a, b) => {
+        let valA = a[column];
+        let valB = b[column];
+        if (typeof valA === 'string') {
+          const cmp = valA.localeCompare(valB);
+          return currentSort.order === 'desc' ? -cmp : cmp;
+        }
+        return currentSort.order === 'desc' ? (valB - valA) : (valA - valB);
+      });
+
+      renderTable();
+    }
+
+    // Render Table
+    function renderTable() {
+      const tbody = document.getElementById('datasetTableBody');
+      const total = filteredRecords.length;
+      const totalPages = Math.ceil(total / pageSize) || 1;
+      currentPage = Math.min(currentPage, totalPages);
+
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, total);
+      const pageSlice = filteredRecords.slice(startIndex, endIndex);
+
+      // Summary label
+      document.getElementById('tableRecordSummary').innerText = `Showing ${total === 0 ? 0 : startIndex + 1}–${endIndex} of ${total.toLocaleString()} employees`;
+      document.getElementById('paginationInfo').innerText = `Page ${currentPage} of ${totalPages}`;
+
+      // Disable/enable page buttons
+      document.getElementById('btnPrev').disabled = (currentPage <= 1);
+      document.getElementById('btnNext').disabled = (currentPage >= totalPages);
+
+      if (pageSlice.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="10" style="text-align:center; padding: 48px; color: var(--text-dim);">
+              No employee records match the selected filter criteria.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      let rowsHtml = '';
+      pageSlice.forEach(r => {
+        const isLeft = r.LeaveOrNot === 1;
+        const outcomeBadge = isLeft
+          ? `<span class="badge badge-left">✕ Left</span>`
+          : `<span class="badge badge-retained">✓ Retained</span>`;
+
+        const benchedBadge = r.EverBenched === 'Yes'
+          ? `<span class="badge badge-benched">⚠️ Yes</span>`
+          : `<span style="color:var(--text-dim);">No</span>`;
+
+        const tierBadge = `<span class="badge badge-tier">Tier ${r.PaymentTier}</span>`;
+
+        rowsHtml += `
+          <tr>
+            <td style="font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim);">#${r.id}</td>
+            <td style="font-weight:600;">${r.Education}</td>
+            <td style="font-family:'JetBrains Mono', monospace;">${r.JoiningYear}</td>
+            <td>${r.City}</td>
+            <td>${tierBadge}</td>
+            <td>${r.Age}</td>
+            <td>${r.Gender}</td>
+            <td>${benchedBadge}</td>
+            <td>${r.ExperienceInCurrentDomain} yrs</td>
+            <td>${outcomeBadge}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = rowsHtml;
+      renderPageNumbers(totalPages);
+    }
+
+    function renderPageNumbers(totalPages) {
+      const container = document.getElementById('pageNumberButtons');
+      let html = '';
+      let start = Math.max(1, currentPage - 2);
+      let end = Math.min(totalPages, start + 4);
+      if (end - start < 4) start = Math.max(1, end - 4);
+
+      for (let p = start; p <= end; p++) {
+        html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goToPage(${p})">${p}</button>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function goToPage(p) {
+      currentPage = p;
+      renderTable();
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderTable();
+    }
+
+    function changePageSize(size) {
+      pageSize = parseInt(size, 10);
+      currentPage = 1;
+      renderTable();
+    }
+
+    // AI Simulator
+    async function runSimulation() {
+      const Education = document.getElementById('simEdu').value;
+      const City = document.getElementById('simCity').value;
+      const PaymentTier = document.getElementById('simTier').value;
+      const EverBenched = document.getElementById('simBenched').value;
+
+      try {
+        const res = await fetch('/api/v2/dataset/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ Education, City, PaymentTier, EverBenched, JoiningYear: 2018, Age: 28, ExperienceInCurrentDomain: 2 })
+        });
+        const data = await res.json();
+        if (data.success && data.prediction) {
+          const p = data.prediction;
+          document.getElementById('simPercentage').innerText = p.percentage + '% Risk';
+          document.getElementById('simPercentage').style.color = p.color;
+          document.getElementById('simRiskLevel').innerText = p.riskLevel;
+          document.getElementById('simRiskLevel').style.color = p.color;
+          document.getElementById('simRec').innerText = p.recommendation;
+        }
+      } catch (e) {
+        // Local calculation fallback
+        let prob = 35;
+        if (PaymentTier === '2') prob += 25;
+        if (City === 'Pune') prob += 18;
+        if (EverBenched === 'Yes') prob += 15;
+        if (Education === 'Masters') prob += 8;
+        prob = Math.min(95, Math.max(10, prob));
+
+        document.getElementById('simPercentage').innerText = prob + '% Risk';
+        const color = prob >= 65 ? 'var(--danger)' : (prob >= 40 ? 'var(--warning)' : 'var(--accent)');
+        document.getElementById('simPercentage').style.color = color;
+        document.getElementById('simRiskLevel').innerText = prob >= 65 ? 'Critical High' : (prob >= 40 ? 'Moderate' : 'Low');
+        document.getElementById('simRiskLevel').style.color = color;
+      }
+    }
+
+    // Add Record Modal
+    function openAddModal() {
+      document.getElementById('addRecordModal').classList.add('open');
+    }
+    function closeAddModal() {
+      document.getElementById('addRecordModal').classList.remove('open');
+    }
+
+    async function submitNewRecord(e) {
+      e.preventDefault();
+      const newRec = {
+        Education: document.getElementById('newEdu').value,
+        JoiningYear: parseInt(document.getElementById('newYear').value, 10),
+        City: document.getElementById('newCity').value,
+        PaymentTier: parseInt(document.getElementById('newTier').value, 10),
+        Age: parseInt(document.getElementById('newAge').value, 10),
+        Gender: document.getElementById('newGender').value,
+        EverBenched: document.getElementById('newBenched').value,
+        ExperienceInCurrentDomain: parseInt(document.getElementById('newExp').value, 10),
+        LeaveOrNot: parseInt(document.getElementById('newLeave').value, 10)
+      };
+
+      try {
+        const res = await fetch('/api/v2/dataset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newRec)
+        });
+        const data = await res.json();
+        if (data.success && data.record) {
+          dataset.unshift(data.record);
+          applyFilters();
+          fetchStats();
+          closeAddModal();
+          alert('Employee record successfully saved to dataset!');
+        }
+      } catch (err) {
+        // In-memory fallback
+        newRec.id = dataset.length + 1;
+        dataset.unshift(newRec);
+        applyFilters();
+        closeAddModal();
+        alert('Record added in local session.');
+      }
+    }
+
+    // Download Dataset
+    function downloadDataset(format) {
+      window.location.href = `/api/v2/dataset/export?format=${format}`;
+    }
+
+    // =========================================================================
+    // CINEMATIC UI/UX THREE.JS UNIVERSE & MAGNETIC CURSOR
+    // =========================================================================
+    (function initCinematicUI() {
+      if (typeof THREE === 'undefined') return;
+      const canvas = document.getElementById('gl');
+      if (!canvas) return;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 400);
+      camera.position.z = 32;
+
+      const N = 1800;
+      const pos = new Float32Array(N * 3);
+      const col = new Float32Array(N * 3);
+      const pal = [0x7c5cff, 0x00e5ff, 0xff4fd8, 0x19f0c4].map(h => new THREE.Color(h));
+      for (let i = 0; i < N; i++) {
+        pos.set([(Math.random() - 0.5) * 140, (Math.random() - 0.5) * 90, Math.random() * -300 + 40], i * 3);
+        const c = pal[i % 4];
+        col.set([c.r, c.g, c.b], i * 3);
+      }
+      const pg = new THREE.BufferGeometry();
+      pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      pg.setAttribute('color', new THREE.BufferAttribute(col, 3));
+      scene.add(new THREE.Points(pg, new THREE.PointsMaterial({
+        size: 0.35,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      })));
+
+      const core = new THREE.Group();
+      const wm = new THREE.MeshBasicMaterial({ color: 0x00e5ff, wireframe: true, transparent: true, opacity: 0.25 });
+      core.add(new THREE.Mesh(new THREE.IcosahedronGeometry(7, 2), wm));
+      const rings = [0, 1, 2].map(i => {
+        const r = new THREE.Mesh(new THREE.TorusGeometry(10 + i * 2.5, 0.04, 8, 120), new THREE.MeshBasicMaterial({ color: 0x7c5cff, transparent: true, opacity: 0.45 }));
+        r.rotation.set(i * 1.1, i * 0.6, 0);
+        core.add(r);
+        return r;
+      });
+      core.position.set(16, 2, -18);
+      scene.add(core);
+
+      const resize = () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+      };
+      resize();
+      window.addEventListener('resize', resize);
+
+      let px = 0, py = 0;
+      window.addEventListener('pointermove', e => {
+        px = (e.clientX / window.innerWidth) * 2 - 1;
+        py = (e.clientY / window.innerHeight) * 2 - 1;
+      });
+
+      function animate(t) {
+        requestAnimationFrame(animate);
+        t *= 0.001;
+        const arr = pg.attributes.position.array;
+        for (let i = 2; i < arr.length; i += 3) {
+          arr[i] += 0.08;
+          if (arr[i] > 40) arr[i] -= 340;
+        }
+        pg.attributes.position.needsUpdate = true;
+        camera.position.x += (px * 3 - camera.position.x) * 0.04;
+        camera.position.y += (-py * 2 - camera.position.y) * 0.04;
+        camera.lookAt(0, 0, -20);
+        core.rotation.y = t * 0.12 + px * 0.3;
+        core.rotation.x = t * 0.06 + py * 0.2;
+        rings.forEach((r, i) => r.rotation.z += 0.003 * (i + 1));
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(animate);
+
+      // Custom Magnetic Cursor
+      const cur_ = document.getElementById('cur');
+      const dot = document.getElementById('dot');
+      let mx = window.innerWidth / 2, my = window.innerHeight / 2, cx = mx, cy = my;
+
+      window.addEventListener('pointermove', e => {
+        mx = e.clientX;
+        my = e.clientY;
+      });
+
+      function renderCursor() {
+        requestAnimationFrame(renderCursor);
+        cx += (mx - cx) * 0.22;
+        cy += (my - cy) * 0.22;
+        if (cur_) { cur_.style.left = cx + 'px'; cur_.style.top = cy + 'px'; }
+        if (dot) { dot.style.left = mx + 'px'; dot.style.top = my + 'px'; }
+      }
+      requestAnimationFrame(renderCursor);
+
+      document.addEventListener('pointerover', e => {
+        if (!cur_) return;
+        const h = e.target.closest('button, a, select, input, .metric-card, .btn');
+        cur_.classList.toggle('hot', !!h);
+        cur_.textContent = h ? (h.dataset?.cur || 'VIEW') : '';
+      });
+
+      window.addEventListener('pointerdown', e => {
+        if (e.target.closest('input, select, textarea, button, a')) return;
+        const s = document.createElement('div');
+        s.className = 'shock';
+        s.style.left = e.clientX + 'px';
+        s.style.top = e.clientY + 'px';
+        document.body.append(s);
+        setTimeout(() => s.remove(), 950);
+      });
+    })();
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', initDataset);
+  </script>
+</body>
+</html>

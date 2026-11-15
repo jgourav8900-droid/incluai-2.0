@@ -1,0 +1,32 @@
+{
+  "name": "incluai-2.0",
+  "version": "2.0.0",
+  "description": "INCLUAI 2.0 — Enterprise Workplace Platform: Frontend, Backend, Database, AI Copilot, Observability & Security",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node tests/api.test.js && node tests/live.test.js"
+  },
+  "dependencies": {
+    "@google/genai": "^2.32.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-rate-limit": "^8.7.2",
+    "jsonwebtoken": "^9.0.2",
+    "mammoth": "^1.13.0",
+    "multer": "^2.5.0",
+    "pdf-parse": "^2.4.5",
+    "uuid": "^9.0.1"
+  },
+  "keywords": [
+    "workplace",
+    "ai-copilot",
+    "rag",
+    "observability",
+    "accessibility"
+  ],
+  "author": "INCLUAI Core Team",
+  "license": "ISC"
+}
