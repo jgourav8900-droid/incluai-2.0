@@ -12,7 +12,7 @@ router.get('/', authenticateToken, (req, res) => {
   if (isHRorAdmin) {
     reports = db.find('reports', r => r.companyId === req.user.companyId);
   } else {
-    reports = db.find('reports', r => r.companyId === req.user.companyId && (r.submitterId === req.user.id || r.isAnonymous));
+    reports = db.find('reports', r => r.companyId === req.user.companyId && r.submitterId === req.user.id && !r.isAnonymous);
   }
 
   // Filter if query params provided

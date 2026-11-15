@@ -19,7 +19,7 @@ const { parseFile } = require('../services/documentParser');
 const { authenticateToken, requireRole } = require('../services/authService');
 
 // ── Multer: store uploads in data/uploads/, keep original name ─────────────
-const UPLOAD_DIR = path.join(__dirname, '..', 'data', 'uploads');
+const UPLOAD_DIR = path.join(process.env.INCLUAI_DATA_DIR || path.join(__dirname, '..', 'data'), 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 const storage = multer.diskStorage({
@@ -79,7 +79,7 @@ router.post('/search', authenticateToken, async (req, res) => {
 // ── POST /upload  (JSON body) ───────────────────────────────────────────────
 router.post('/upload',
   authenticateToken,
-  requireRole(['HR_Admin', 'Organization_Admin', 'Employee']),
+  requireRole(['HR_Admin', 'Organization_Admin']),
   async (req, res) => {
     const { title, category, section, content, tags } = req.body;
     if (!title || !content) {
@@ -117,7 +117,7 @@ router.post('/upload',
 // ── POST /upload-file  (multipart form) ────────────────────────────────────
 router.post('/upload-file',
   authenticateToken,
-  requireRole(['HR_Admin', 'Organization_Admin', 'Employee']),
+  requireRole(['HR_Admin', 'Organization_Admin']),
   upload.single('file'),
   async (req, res) => {
     if (!req.file) {

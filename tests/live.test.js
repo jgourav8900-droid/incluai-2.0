@@ -1,4 +1,5 @@
 process.env.NODE_ENV = 'test';
+const cleanupTestData = require('./testData').createTestData();
 const app = require('../server');
 const http = require('http');
 
@@ -135,6 +136,7 @@ async function runLiveTests() {
     failed++;
   } finally {
     server.close(() => {
+      cleanupTestData();
       console.log(`\nLIVE TEST SUMMARY: ${passed} Passed, ${failed} Failed`);
       process.exit(failed > 0 ? 1 : 0);
     });

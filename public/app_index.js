@@ -2,6 +2,7 @@
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
 const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 
 /* ══════════════════════════════════════════════════════════
    GUARANTEED LOADER DISMISSAL
@@ -217,22 +218,22 @@ addEventListener('pointerdown',e=>{
 
 /* ── Interactive How It Works Timeline ── */
 const timelineData=[
-  {badge:'STAGE 01 &middot; MULTI-SOURCE INGESTION',title:'Enterprise Multi-Source Knowledge Ingestion',
-   desc:'Connects to Google Drive, Notion, Workday, and PDF handbooks. Parses structural hierarchies into cryptographically hashed semantic units.',
-   list:['&#10004; Automatic version drift detection when policies update','&#10004; Tenant-isolated encrypted SQLite/PostgreSQL storage','&#10004; SOC2-compliant role-based access boundaries'],
-   code:'// INCLUAI Ingestion Engine v2.0\nconst docBatch = await ragService.indexDocument({\n  title: "Hybrid Remote Work Policy 2026",\n  companyId: "COMP001",\n  chunks: 48,\n  embeddings: "text-embedding-3-small",\n  securityLevel: "AES-256-GCM"\n});\n// Status: 48 chunks indexed, cosine threshold 0.10'},
-  {badge:'STAGE 02 &middot; NEURAL GROUNDING',title:'Zero-Hallucination Vector Search & Retrieval',
-   desc:'Queries undergo dense cosine similarity matching against indexed policy chunks. Responses cite exact page and paragraph numbers.',
-   list:['&#10004; 99.4% factual grounding accuracy score','&#10004; Deterministic citation hyperlinking to original policies','&#10004; Automatic refusal when confidence is below 85%'],
+  {badge:'STAGE 01 &middot; POLICY DOCUMENTS',title:'Policy Document Search',
+   desc:'Upload company policy documents for search. This prototype stores application records in local JSON files.',
+   list:['&#10004; Search uploaded policy documents','&#10004; Company-scoped records and role checks','&#10004; Local JSON-file storage'],
+   code:'// Policy document indexing\nawait ragService.indexDocument({\n  title: "Hybrid Remote Work Policy 2026",\n  companyId: "COMP001"\n});\n// Embeddings depend on provider configuration'},
+  {badge:'STAGE 02 &middot; POLICY SEARCH',title:'Policy Search & AI Responses',
+   desc:'Searches available company policy documents and can include a source citation. AI responses may be incomplete or incorrect.',
+   list:['&#10004; Search configured policy documents','&#10004; Citations refer to indexed source documents','&#10004; Verify important answers against the source'],
    code:'// Vector Cosine Similarity Search\nconst matches = ragService.searchCompanyDocuments(\n  companyId, userPrompt, 0.10\n);\n// Match: Hybrid Remote Work Policy (Score: 0.94)\n// Grounded citation: "Section 3.2 - Out of State Work"'},
-  {badge:'STAGE 03 &middot; PRIVACY SHIELD',title:'Zero-Knowledge Anonymity & Cryptographic Shield',
-   desc:'Server-side token stripper purges IP addresses, browser fingerprints, and session identifiers from all barrier reports.',
-   list:['&#10004; HMAC-SHA256 one-way cryptographic hashing','&#10004; Zero employee traceability for leadership and HR','&#10004; Complete psychological safety for barrier reporting'],
-   code:'// Server-Side Token Scrubbing\nconst sanitizedReport = {\n  category: "Physical Accessibility",\n  description: scrubPII(rawFeedback),\n  anonymousToken: crypto.createHmac("sha256", secret)\n    .update(sessionId).digest("hex"),\n  timestamp: new Date().toISOString()\n}; // Output: Zero PII or IP logged'},
-  {badge:'STAGE 04 &middot; CLOSED-LOOP RESOLUTION',title:'2.4-Day SLA Automated Accommodation Dispatch',
-   desc:'Approved accommodations trigger automated tasks with strict 2.4-day resolution SLAs. Live telemetry dashboards track resolution health.',
-   list:['&#10004; Automated task dispatching to facilities and IT','&#10004; Real-time SLA breach prevention alerts at 24h & 48h','&#10004; Closed-loop resolution notification to employee'],
-   code:'// Automated Task Creation & SLA Enforcer\nconst task = db.insert("tasks", {\n  title: "Ergonomic Standing Desk Dispatch",\n  priority: "High",\n  slaHours: 57.6,\n  status: "In Progress"\n});\n// Telemetry: Average resolution 2.4 days across 4,653 tasks'}
+  {badge:'STAGE 03 &middot; REPORT PRIVACY',title:'Anonymous Report Submission',
+   desc:'Anonymous submissions are stored without the submitting account ID. Report text can still contain identifying details.',
+   list:['&#10004; Account ID omitted for anonymous submissions','&#10004; HR/Admin access is required to review reports','&#10004; Avoid identifying details when anonymity matters'],
+   code:'// Anonymous report fields\nconst report = {\n  isAnonymous: true,\n  submitterId: null,\n  description: reportText\n}; // Report text is not automatically scrubbed'},
+  {badge:'STAGE 04 &middot; WORKPLACE TASKS',title:'Workplace Task Tracking',
+   desc:'Authenticated users can create and track workplace tasks. This prototype does not enforce a resolution SLA.',
+   list:['&#10004; Create and update workplace tasks','&#10004; View tasks within the current company','&#10004; No automated SLA enforcement'],
+   code:'// Create a workplace task\nconst task = db.insert("tasks", {\n  title: "Review accessibility request",\n  status: "In Progress"\n});'}
 ];
 
 function showTimelineStep(idx){
@@ -280,7 +281,7 @@ async function executeDemoQuery(query){
     if(data.success){
       const ans=data.response||data.answer||'Query verified and grounded against company policy.';
       const cite=data.citation?.title||(data.sources&&data.sources[0]?.title)||'Hybrid Remote Work Policy 2026';
-      aiBubble.innerHTML='<div style="font-weight:700;margin-bottom:6px;color:var(--b);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;"><span>&#129302; Grounded AI Response</span><span style="font-size:11px;color:var(--teal);font-family:JetBrains Mono;">&#9889; '+(data.provider||'Google Gemini 2.0')+' &middot; '+(data.latencyMs||24)+'ms</span></div><div style="line-height:1.6;white-space:pre-wrap;">'+ans+'</div><div style="margin-top:10px;"><span style="display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(0,229,255,0.12);border:1px solid var(--b);font-size:11px;color:var(--b);">&#128196; '+cite+'</span></div><div style="margin-top:12px;font-size:12px;"><a href="/app" style="color:var(--b);text-decoration:none;font-weight:600;">Open in Workplace Platform 2.0 &#8594;</a></div>';
+      aiBubble.innerHTML='<div style="font-weight:700;margin-bottom:6px;color:var(--b);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;"><span>&#129302; Grounded AI Response</span><span style="font-size:11px;color:var(--teal);font-family:JetBrains Mono;">&#9889; '+escapeHTML(data.provider||'Offline fallback')+' &middot; '+escapeHTML(Number(data.latencyMs)||0)+'ms</span></div><div style="line-height:1.6;white-space:pre-wrap;">'+escapeHTML(ans)+'</div><div style="margin-top:10px;"><span style="display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(0,229,255,0.12);border:1px solid var(--b);font-size:11px;color:var(--b);">&#128196; '+escapeHTML(cite)+'</span></div><div style="margin-top:12px;font-size:12px;"><a href="/app" style="color:var(--b);text-decoration:none;font-weight:600;">Open in Workplace Platform 2.0 &#8594;</a></div>';
     }else{
       aiBubble.innerHTML='<strong>Copilot:</strong> Based on our Hybrid Remote Work and Accessibility Handbooks: Remote work is supported across approved jurisdictions with standard 2.4-day accommodation routing.';
     }
@@ -357,10 +358,8 @@ if(vibeForm){
       const data=await res.json();
       if(data.success){
         if(label)label.textContent='Spot Secured \u2746';
-        if(data.token)localStorage.setItem('incluai_token',data.token);
-        if(data.member)localStorage.setItem('incluai_user',JSON.stringify(data.member));
         const t=$('#vipSuccessTitle');if(t)t.textContent='Spot #'+(data.member?.spotNumber||'249')+' Reserved \u2746';
-        const d=$('#vipSuccessDesc');if(d)d.textContent=data.message||'VIP Session token generated and active.';
+        const d=$('#vipSuccessDesc');if(d)d.textContent=data.message||'Your early-access interest has been recorded.';
         const b=$('#waitlistSuccessBanner');if(b)b.style.display='block';
         loadStats();
       }else{if(label)label.textContent='Error: '+(data.error||'Try again');}

@@ -81,7 +81,6 @@ app.use((req, res, next) => {
 
 // Serve static frontend assets
 app.use(express.static(path.join(__dirname, 'public'), { etag: false, maxAge: 0 }));
-app.use(express.static(__dirname, { etag: false, maxAge: 0 }));
 
 // Mount Versioned API Routes
 app.use('/api/v2/auth', require('./routes/auth'));
@@ -112,7 +111,7 @@ app.get(['/dataset', '/dataset.html'], (req, res) => {
 
 // Fallback index.html route for client-side routing
 app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api/')) {
+  if (req.path.startsWith('/api/') || path.extname(req.path)) {
     return next();
   }
   const indexPath = path.join(__dirname, 'public', 'index.html');

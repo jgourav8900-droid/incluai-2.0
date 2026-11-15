@@ -8,9 +8,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const { GoogleGenerativeAI } = require('@google/genai');
+const { GoogleGenAI } = require('@google/genai');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
+const DATA_DIR = process.env.INCLUAI_DATA_DIR || path.join(__dirname, '..', 'data');
 const EMBEDDINGS_FILE = path.join(DATA_DIR, 'embeddings.json');
 
 // Load persisted embeddings or start fresh
@@ -34,8 +34,7 @@ class EmbeddingService {
     const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
     if (apiKey && apiKey.trim().length > 5 && !apiKey.startsWith('YOUR_')) {
       try {
-        // GoogleGenerativeAI is the correct class for @google/genai >= 0.13
-        this.client = new GoogleGenerativeAI(apiKey.trim());
+        this.client = new GoogleGenAI({ apiKey: apiKey.trim() });
         console.log('[EmbeddingService] Gemini client initialized.');
       } catch (err) {
         console.error('[EmbeddingService] Failed to init client:', err.message);
@@ -54,9 +53,11 @@ class EmbeddingService {
   async generate(text) {
     if (!this.client) return null;
     try {
-      const model = this.client.getGenerativeModel({ model: 'text-embedding-004' });
-      const result = await model.embedContent(text);
-      return result?.embedding?.values ?? null;
+      const result = await this.client.models.embedContent({
+        model: 'gemini-embedding-001',
+        contents: text
+      });
+      return result?.embeddings?.[0]?.values ?? null;
     } catch (err) {
       console.warn('[EmbeddingService] Embedding generation failed:', err.message);
       return null;

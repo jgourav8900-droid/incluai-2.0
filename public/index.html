@@ -821,7 +821,7 @@ body.focus-mode :focus{
     </div>
 
     <p class="sub">
-      For everyone who typed a reply, deleted it, and sent a thumbs up instead. An enterprise AI workplace intelligence platform built by people, for everyone. Grounded policy assistance, verifiable citations, zero-retaliation barrier reporting, and real-time inclusion telemetry.
+      For everyone who typed a reply, deleted it, and sent a thumbs up instead. A workplace support prototype with policy search, confidential reporting, and accessibility-focused tools.
     </p>
 
     <div class="cta">
@@ -851,9 +851,9 @@ body.focus-mode :focus{
       <span>Grounded AI Copilot</span><span>✦</span>
       <span>Psychological Safety</span><span>✦</span>
       <span>4,653 Verified Records</span><span>✦</span>
-      <span>2.4-Day Accommodation SLA</span><span>✦</span>
-      <span>Cryptographic Anonymity</span><span>✦</span>
-      <span>Zero Hallucination</span><span>✦</span>
+      <span>Workplace Task Tracking</span><span>✦</span>
+      <span>Private-by-design reporting</span><span>✦</span>
+      <span>AI answers may need verification</span><span>✦</span>
       <span>Real Feels</span><span>✦</span>
       <span>Zero Filter</span><span>✦</span>
       <span>Grounded AI Copilot</span><span>✦</span>
@@ -898,7 +898,7 @@ body.focus-mode :focus{
         <div class="gl"></div>
         <i>04</i>
         <h3>confidential safety</h3>
-        <p>Server-side token stripping ensures zero-retaliation psychological safety for barrier reporting.</p>
+        <p>Anonymous submissions are stored without the submitting account ID. Report text may still identify its author, so avoid including identifying details when anonymity matters.</p>
         <div class="screen"></div>
       </article>
     </div>
@@ -925,9 +925,9 @@ body.focus-mode :focus{
         <div class="comp-vs">VS</div>
         <div class="comp-card solution glass tilt" data-cur="SOLUTION">
           <span class="comp-tag s-tag">The INCLUAI Standard</span>
-          <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Instant Grounded AI Copilot (Zero Hallucination)</h3>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Policy Search &amp; AI Assistance</h3>
           <p style="font-size:14px;color:var(--text);line-height:1.55;">
-            Verifiable answers in 0.4 seconds, strictly grounded in verified company handbooks with exact policy citation links and confidence scoring.
+            AI responses can include citations to indexed policy documents, but may be incomplete or incorrect. Verify important answers against the source.
           </p>
         </div>
       </div>
@@ -944,9 +944,9 @@ body.focus-mode :focus{
         <div class="comp-vs">VS</div>
         <div class="comp-card solution glass tilt" data-cur="SOLUTION">
           <span class="comp-tag s-tag">The INCLUAI Standard</span>
-          <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Cryptographic Zero-Knowledge Anonymity</h3>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;color:var(--teal);">Anonymous Report Submission</h3>
           <p style="font-size:14px;color:var(--text);line-height:1.55;">
-            Server-side token scrubbing cryptographically strips session IDs, IP headers, and PII before reports reach ethics and leadership dashboards.
+            Anonymous submissions omit the submitter account ID. Report text may still identify its author; avoid including identifying details when anonymity matters.
           </p>
         </div>
       </div>
@@ -1013,8 +1013,8 @@ body.focus-mode :focus{
       </div>
       <div class="step-nav-btn" id="stepBtn2" onclick="showTimelineStep(2)" data-cur="STEP 3">
         <div class="step-num">03</div>
-        <div class="step-title">Zero-Knowledge Shield</div>
-        <div class="step-desc">Server-side token scrubbing &amp; anonymity.</div>
+        <div class="step-title">Report Privacy</div>
+        <div class="step-desc">Anonymous submissions omit the submitter account ID.</div>
       </div>
       <div class="step-nav-btn" id="stepBtn3" onclick="showTimelineStep(3)" data-cur="STEP 4">
         <div class="step-num">04</div>
@@ -1033,8 +1033,8 @@ body.focus-mode :focus{
         </p>
         <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;font-size:13.5px;color:var(--muted);" id="previewList">
           <li>✔ Automatic version drift detection when policies update</li>
-          <li>✔ Tenant-isolated encrypted SQLite/PostgreSQL storage</li>
-          <li>✔ SOC2-compliant role-based access boundaries</li>
+          <li>✔ Search across the organization’s configured policy documents</li>
+          <li>✔ Role-based access checks for restricted features</li>
         </ul>
       </div>
       <div>
@@ -1043,8 +1043,7 @@ const docBatch = await ragService.indexDocument({
   title: "Hybrid Remote Work Policy 2026",
   companyId: "COMP001",
   chunks: 48,
-  embeddings: "text-embedding-3-small",
-  securityLevel: "AES-256-GCM"
+  embeddings: "Google GenAI when configured"
 });
 // Status: 48 chunks indexed, cosine threshold 0.10</div>
       </div>
@@ -1057,7 +1056,7 @@ const docBatch = await ragService.indexDocument({
   <section id="copilot-demo">
     <div class="eyebrow">// interactive demonstration</div>
     <h2>Try The Grounded AI Copilot Live</h2>
-    <p class="sec-sub">Experience real zero-hallucination assistance. Click a prompt below or type your own workplace question.</p>
+    <p class="sec-sub">Try policy search. AI responses can be incomplete or incorrect; verify important decisions against the cited source documents.</p>
 
     <div class="copilot-demo-shell glass">
       <div class="copilot-demo-header">
@@ -1209,21 +1208,21 @@ const docBatch = await ragService.indexDocument({
       <div class="trust-card glass tilt" data-cur="SECURITY">
         <div class="gl"></div>
         <div class="trust-icon">🛡️</div>
-        <h3 style="font:700 18px Unbounded;margin-bottom:8px;">Zero-Knowledge Anonymity</h3>
+        <h3 style="font:700 18px Unbounded;margin-bottom:8px;">Anonymous Report Submission</h3>
         <p style="font-size:14px;color:var(--muted);line-height:1.55;">
-          Grievance reporting cryptographically strips user identifiers, IP addresses, and hardware fingerprints before storage, eliminating retaliation risks.
+          Anonymous submissions omit the submitter account ID. This prototype does not guarantee anonymity if a report contains identifying details.
         </p>
-        <span class="trust-badge">HMAC-SHA256 Token Scrubbing</span>
+        <span class="trust-badge">Submitter account ID omitted</span>
       </div>
 
       <div class="trust-card glass tilt" data-cur="SECURITY">
         <div class="gl"></div>
         <div class="trust-icon">🔒</div>
-        <h3 style="font:700 18px Unbounded;margin-bottom:8px;">SOC2 Type II &amp; GDPR Ready</h3>
+        <h3 style="font:700 18px Unbounded;margin-bottom:8px;">Prototype Security Controls</h3>
         <p style="font-size:14px;color:var(--muted);line-height:1.55;">
-          Data encrypted with AES-256 at rest and TLS 1.3 in transit. Fully isolated multi-tenant architecture with strict tenant separation boundaries.
+          The application uses JWT sessions, role checks, and company-scoped queries. It has not been independently certified or assessed for regulatory compliance.
         </p>
-        <span class="trust-badge">AES-256 GCM Encryption</span>
+        <span class="trust-badge">Not a compliance certification</span>
       </div>
 
       <div class="trust-card glass tilt" data-cur="SECURITY">
@@ -1349,9 +1348,9 @@ const docBatch = await ragService.indexDocument({
         <div>
           <div class="road-q">Q1 2026 &middot; COMPLETED</div>
           <span class="road-status live">Shipped ✦</span>
-          <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Neural Policy RAG Core</h3>
+          <h3 style="font:700 17px Unbounded;margin-bottom:8px;">Policy Document Search</h3>
           <p style="font-size:13.5px;color:var(--muted);line-height:1.5;">
-            Cosine vector search across handbooks, deterministic grounding, and zero-hallucination citation engines.
+            Search configured policy documents and review any citations against the source. AI responses can be inaccurate.
           </p>
         </div>
         <button class="vote-btn" onclick="voteRoadmap('feat_rag')" id="vote_feat_rag">
@@ -1430,21 +1429,21 @@ const docBatch = await ragService.indexDocument({
     <div class="faq-box">
       <div class="faq-item glass open" onclick="toggleFaq(this)">
         <div class="faq-q">
-          <span>How does INCLUAI guarantee zero retaliation for anonymous barrier reports?</span>
+          <span>What information is omitted for anonymous barrier reports?</span>
           <i>+</i>
         </div>
         <div class="faq-a">
-          Our server-side architecture uses HMAC-SHA256 token scrubbing to decouple reports from session tokens, IP headers, and account identifiers before writing to the database. Even database administrators and HR leaders cannot trace an anonymous report back to an employee account.
+          Anonymous submissions are stored without the submitting account ID. The report description and other submitted content are not automatically scrubbed and may identify the author.
         </div>
       </div>
 
       <div class="faq-item glass" onclick="toggleFaq(this)">
         <div class="faq-q">
-          <span>How does the Grounded AI Copilot prevent hallucinations?</span>
+          <span>How should I use AI Copilot answers?</span>
           <i>+</i>
         </div>
         <div class="faq-a">
-          Unlike generic consumer chatbots, INCLUAI utilizes strict cosine similarity vector RAG across your authenticated company policy repository. If an answer cannot be grounded with at least 85% confidence in an indexed policy, the Copilot explicitly declines to guess and routes to human HR instead.
+          AI Copilot can search configured policy documents and may provide citations, but it does not guarantee accuracy or detect every unsupported claim. Check important information against the cited source and consult HR when needed.
         </div>
       </div>
 
@@ -1460,11 +1459,11 @@ const docBatch = await ragService.indexDocument({
 
       <div class="faq-item glass" onclick="toggleFaq(this)">
         <div class="faq-q">
-          <span>Is our proprietary corporate data used to train public AI models?</span>
+          <span>Where is organization data stored?</span>
           <i>+</i>
         </div>
         <div class="faq-a">
-          Never. INCLUAI maintains strict zero-retention and zero-training policies. Your company documents, internal discussions, and employee telemetry remain completely isolated in your private enterprise tenant database.
+          This prototype stores application records in local JSON files. If an external AI provider is configured, review that provider's data-handling terms before sending organization content.
         </div>
       </div>
 
@@ -1578,7 +1577,7 @@ const docBatch = await ragService.indexDocument({
       <div class="footer-brand">
         <h4>INCLUAI 2.0</h4>
         <p>
-          The inclusive workplace intelligence platform. Grounded AI assistance, verifiable policy knowledge, cryptographic anonymity, and autonomous accessibility resolution.
+          A workplace-support prototype with policy search, anonymous report submission, task tracking, and accessibility-focused tools.
         </p>
         <div class="status-indicator">
           <span></span>
@@ -1612,8 +1611,8 @@ const docBatch = await ragService.indexDocument({
         <h5>Trust &amp; Legal</h5>
         <ul>
           <li><a href="#trust">Privacy Center</a></li>
-          <li><a href="#trust">SOC2 Type II</a></li>
-          <li><a href="#trust">Zero Retention</a></li>
+          <li><a href="#trust">Prototype security controls</a></li>
+          <li><a href="#trust">Data handling</a></li>
           <li><a href="/api/v2/observability/metrics" target="_blank">System Telemetry</a></li>
           <li><a href="#faq">Security FAQ</a></li>
         </ul>

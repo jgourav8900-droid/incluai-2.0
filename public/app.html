@@ -2472,7 +2472,7 @@
           <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
             <div>
               <h1 class="page-title">Workforce Attrition Dataset & Analytics</h1>
-              <p class="page-subtitle">4,653 verified employee records tracking education, hub cities, compensation tiers, and turnover.</p>
+              <p class="page-subtitle">Restricted workforce records for aggregate planning by authorized HR and organization administrators.</p>
             </div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
               <a href="/dataset.html" target="_blank" class="btn btn-primary" style="background:linear-gradient(135deg, var(--teal), var(--amber)); color:#000; text-decoration:none;">
@@ -2481,6 +2481,7 @@
               <button class="btn btn-outline btn-sm" onclick="downloadAppDataset('csv')">📥 CSV</button>
               <button class="btn btn-outline btn-sm" onclick="downloadAppDataset('json')">📦 JSON</button>
             </div>
+            <div id="appDatasetAccessNotice" role="status" aria-live="polite" style="display:none;margin:0 0 18px;padding:14px 18px;border:1px solid var(--amber);border-radius:12px;color:var(--text);"></div>
           </div>
 
           <!-- Dataset KPI Cards -->
@@ -3703,7 +3704,7 @@
           tbody.innerHTML = data.reports.map(r => `
             <tr>
               <td style="font-family:'JetBrains Mono'; color:var(--amber-light);">${r.id}</td>
-              <td><span class="badge badge-amber">${r.category}</span></td>
+              <td><span class="badge badge-amber">${escapeHtml(r.category)}</span></td>
               <td>${escapeHtml(r.description.slice(0, 65))}${r.description.length > 65 ? '...' : ''}</td>
               <td>${escapeHtml(r.assignedTo || 'Unassigned')}</td>
               <td>${r.isAnonymous ? '🛡️ Anonymous' : 'Identified'}</td>
@@ -4346,34 +4347,43 @@
 
     async function loadDatasetData() {
       try {
-        fetch('/api/v2/dataset/stats')
-          .then(res => res.json())
-          .then(json => {
-            if (json.success && json.stats) {
-              const s = json.stats;
-              const totalEl = document.getElementById('appDatasetTotal');
-              if (totalEl) totalEl.innerText = s.totalRecords.toLocaleString();
-              const retEl = document.getElementById('appDatasetRetention');
-              if (retEl) retEl.innerText = s.retentionRate + '%';
-              const retCntEl = document.getElementById('appDatasetRetainedCount');
-              if (retCntEl) retCntEl.innerText = s.retainedCount.toLocaleString() + ' retained';
-              const attEl = document.getElementById('appDatasetAttrition');
-              if (attEl) attEl.innerText = s.attritionRate + '%';
-              const leftCntEl = document.getElementById('appDatasetLeftCount');
-              if (leftCntEl) leftCntEl.innerText = s.leftCount.toLocaleString() + ' departed';
-              const benchEl = document.getElementById('appDatasetBench');
-              if (benchEl) benchEl.innerText = s.benchedRate + '%';
-            }
-          }).catch(e => console.log('Stats fetch fallback'));
-
-        if (!appDatasetRecords.length) {
-          let res = await fetch('/api/v2/dataset?limit=all');
-          if (!res.ok) res = await fetch('/data/employee_attrition.json');
-          const data = await res.json();
-          appDatasetRecords = Array.isArray(data) ? data : (data.data || []);
-          appFilteredRecords = [...appDatasetRecords];
+        const notice = document.getElementById('appDatasetAccessNotice');
+        const restrictedContent = document.querySelectorAll('#page-dataset .metrics-grid, #page-dataset .card');
+        const denyAccess = message => {
+          notice.textContent = message;
+          notice.style.display = 'block';
+          restrictedContent.forEach(element => { element.hidden = true; });
+        };
+        if (!authToken) {
+          denyAccess('Sign in as HR or an organization administrator to view workforce records.');
+          return;
+        }
+        const headers = { Authorization: `Bearer ${authToken}` };
+        const [statsResponse, recordsResponse] = await Promise.all([
+          fetch('/api/v2/dataset/stats', { headers }),
+          fetch('/api/v2/dataset?limit=all', { headers })
+        ]);
+        if (!statsResponse.ok || !recordsResponse.ok) {
+          const denied = statsResponse.status === 401 || statsResponse.status === 403 ||
+            recordsResponse.status === 401 || recordsResponse.status === 403;
+          denyAccess(denied
+            ? 'Your account does not have permission to view workforce records.'
+            : 'Workforce records could not be loaded.');
+          return;
         }
 
+        const [statsJson, recordsJson] = await Promise.all([statsResponse.json(), recordsResponse.json()]);
+        if (statsJson.success && statsJson.stats) {
+          const s = statsJson.stats;
+          document.getElementById('appDatasetTotal').innerText = s.totalRecords.toLocaleString();
+          document.getElementById('appDatasetRetention').innerText = s.retentionRate + '%';
+          document.getElementById('appDatasetRetainedCount').innerText = s.retainedCount.toLocaleString() + ' retained';
+          document.getElementById('appDatasetAttrition').innerText = s.attritionRate + '%';
+          document.getElementById('appDatasetLeftCount').innerText = s.leftCount.toLocaleString() + ' departed';
+          document.getElementById('appDatasetBench').innerText = s.benchedRate + '%';
+        }
+        appDatasetRecords = Array.isArray(recordsJson) ? recordsJson : (recordsJson.data || []);
+        appFilteredRecords = [...appDatasetRecords];
         renderAppDatasetTable();
       } catch (err) {
         console.error('Failed to load dataset:', err);
@@ -4444,15 +4454,15 @@
 
       tbody.innerHTML = slice.map(r => `
         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-          <td style="padding:10px 16px; font-family:'JetBrains Mono'; color:var(--text-dim);">#${r.id}</td>
-          <td style="padding:10px 16px; font-weight:600;">${r.Education}</td>
-          <td style="padding:10px 16px; font-family:'JetBrains Mono';">${r.JoiningYear}</td>
-          <td style="padding:10px 16px;">${r.City}</td>
-          <td style="padding:10px 16px;"><span class="badge badge-amber" style="font-size:10px; padding:2px 6px;">Tier ${r.PaymentTier}</span></td>
-          <td style="padding:10px 16px;">${r.Age}</td>
-          <td style="padding:10px 16px;">${r.Gender}</td>
+          <td style="padding:10px 16px; font-family:'JetBrains Mono'; color:var(--text-dim);">#${escapeHtml(r.id)}</td>
+          <td style="padding:10px 16px; font-weight:600;">${escapeHtml(r.Education)}</td>
+          <td style="padding:10px 16px; font-family:'JetBrains Mono';">${escapeHtml(r.JoiningYear)}</td>
+          <td style="padding:10px 16px;">${escapeHtml(r.City)}</td>
+          <td style="padding:10px 16px;"><span class="badge badge-amber" style="font-size:10px; padding:2px 6px;">Tier ${escapeHtml(r.PaymentTier)}</span></td>
+          <td style="padding:10px 16px;">${escapeHtml(r.Age)}</td>
+          <td style="padding:10px 16px;">${escapeHtml(r.Gender)}</td>
           <td style="padding:10px 16px;">${r.EverBenched === 'Yes' ? '<span style="color:var(--amber);">⚠️ Yes</span>' : '<span style="color:var(--text-dim);">No</span>'}</td>
-          <td style="padding:10px 16px;">${r.ExperienceInCurrentDomain} yrs</td>
+          <td style="padding:10px 16px;">${escapeHtml(r.ExperienceInCurrentDomain)} yrs</td>
           <td style="padding:10px 16px;">${r.LeaveOrNot === 1 ? '<span class="badge badge-red" style="font-size:10px; padding:2px 8px;">✕ Left</span>' : '<span class="badge badge-green" style="font-size:10px; padding:2px 8px;">✓ Retained</span>'}</td>
         </tr>
       `).join('');
@@ -4463,8 +4473,24 @@
       renderAppDatasetTable();
     }
 
-    function downloadAppDataset(format) {
-      window.location.href = `/api/v2/dataset/export?format=${format}`;
+    async function downloadAppDataset(format) {
+      if (!authToken) {
+        alert('Sign in as HR or an organization administrator to export workforce data.');
+        return;
+      }
+      const res = await fetch(`/api/v2/dataset/export?format=${encodeURIComponent(format)}`, {
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      if (!res.ok) {
+        alert('Your account does not have permission to export workforce data.');
+        return;
+      }
+      const url = URL.createObjectURL(await res.blob());
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = format === 'json' ? 'employee_attrition_dataset.json' : 'employee_attrition_dataset.csv';
+      link.click();
+      URL.revokeObjectURL(url);
     }
 
     // Initialize application on load

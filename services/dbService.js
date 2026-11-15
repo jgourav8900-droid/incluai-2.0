@@ -3,21 +3,46 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
+const DATA_DIR = process.env.INCLUAI_DATA_DIR || path.join(__dirname, '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-function hashPassword(password, salt = 'incluai_default_salt_2026') {
-  return crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16);
+  const hash = crypto.scryptSync(password, salt, 64);
+  return `scrypt$${salt.toString('hex')}$${hash.toString('hex')}`;
+}
+
+function verifyPassword(password, passwordHash) {
+  if (typeof passwordHash !== 'string') return { valid: false, needsUpgrade: false };
+  if (passwordHash.startsWith('scrypt$')) {
+    const [, saltHex, hashHex] = passwordHash.split('$');
+    if (!saltHex || !hashHex || !/^[a-f\d]+$/i.test(saltHex) || !/^[a-f\d]+$/i.test(hashHex)) {
+      return { valid: false, needsUpgrade: false };
+    }
+    const expected = Buffer.from(hashHex, 'hex');
+    const actual = crypto.scryptSync(password, Buffer.from(saltHex, 'hex'), expected.length);
+    return {
+      valid: expected.length === actual.length && crypto.timingSafeEqual(expected, actual),
+      needsUpgrade: false
+    };
+  }
+
+  const legacyHash = crypto.pbkdf2Sync(password, 'incluai_default_salt_2026', 1000, 64, 'sha512');
+  const storedHash = Buffer.from(passwordHash, 'hex');
+  return {
+    valid: storedHash.length === legacyHash.length && crypto.timingSafeEqual(storedHash, legacyHash),
+    needsUpgrade: true
+  };
 }
 
 // Factory: returns a fresh copy every time so callers never share mutable state
 function makeDefaultDB() {
   return {
-    users: [
+    users: process.env.NODE_ENV === 'production' ? [] : [
       {
         id: 'usr_emp_1042',
         companyId: 'COMP001',
@@ -374,3 +399,4 @@ class DatabaseService {
 
 module.exports = new DatabaseService();
 module.exports.hashPassword = hashPassword;
+module.exports.verifyPassword = verifyPassword;

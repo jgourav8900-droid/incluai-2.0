@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const dbService = require('../services/dbService');
-const { generateToken, authenticateToken, requireRole } = require('../services/authService');
+const { authenticateToken, requireRole } = require('../services/authService');
 
 // POST /api/v2/waitlist — Join waitlist & save vibe
 router.post('/', (req, res) => {
@@ -41,7 +41,6 @@ router.post('/', (req, res) => {
           employeeId: `EARLY_${existing.spotNumber}`,
           avatar: existing.name ? existing.name.charAt(0).toUpperCase() : '✦'
         },
-        token: existing.token
       });
     }
 
@@ -49,17 +48,6 @@ router.post('/', (req, res) => {
     const baseCount = 248; // early batch offset
     const spotNumber = baseCount + allMembers.length + 1;
     const memberId = `wait_${Date.now()}`;
-
-    // Issue VIP early access session token
-    const token = generateToken({
-      id: memberId,
-      companyId: 'COMP001',
-      employeeId: `EARLY_${spotNumber}`,
-      email: cleanEmail,
-      name: cleanName,
-      role: 'Employee',
-      department: 'Early Access Collective'
-    });
 
     const newMember = {
       id: memberId,
@@ -69,7 +57,6 @@ router.post('/', (req, res) => {
       mood: cleanMood,
       hype: numHype,
       msg: cleanMsg,
-      token,
       createdAt: new Date().toISOString()
     };
 
@@ -87,12 +74,10 @@ router.post('/', (req, res) => {
         hype: newMember.hype,
         spotNumber: newMember.spotNumber,
         role: 'Early Member (VIP)',
-        companyId: 'COMP001',
         department: 'Early Access Collective',
         employeeId: `EARLY_${spotNumber}`,
         avatar: cleanName ? cleanName.charAt(0).toUpperCase() : '✦'
       },
-      token
     });
   } catch (err) {
     console.error('[Waitlist API Error]', err);

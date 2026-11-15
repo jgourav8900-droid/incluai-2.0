@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const { cosineSimilarity } = require('./utils');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
+const DATA_DIR = process.env.INCLUAI_DATA_DIR || path.join(__dirname, '..', 'data');
 const STORE_FILE = path.join(DATA_DIR, 'vectorStore.json');
 
 let store = [];

@@ -846,6 +846,9 @@
         </a>
       </div>
     </section>
+    <div id="datasetAccessNotice" role="status" aria-live="polite" hidden
+      style="margin:16px 0;padding:14px 18px;border:1px solid var(--amber);border-radius:12px;color:var(--text);">
+    </div>
 
     <!-- KPI Metric Cards Grid -->
     <section class="metrics-grid" id="kpiMetrics">
@@ -1009,63 +1012,18 @@
         </div>
       </div>
 
-      <!-- AI Attrition Risk Predictor Simulator -->
+      <!-- Aggregate workforce planning only; no individual prediction model -->
       <div class="card">
         <div class="card-header">
           <div class="card-title">
-            <span>🔮</span>
-            <span data-i18n="sim_title">AI Turnover Risk Simulator</span>
+            <span>📊</span>
+            <span>Workforce Planning</span>
           </div>
-          <span class="card-badge" data-i18n="sim_badge">Real-time Predictor</span>
+          <span class="card-badge">Aggregate only</span>
         </div>
-        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;" data-i18n="sim_desc">
-          Test candidate attributes to estimate retention probability based on our 4,653 employee historical model.
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          Individual attrition predictions are disabled. Use aggregate workforce statistics for planning, never to make employment decisions.
         </p>
-
-        <div class="simulator-box">
-          <div class="sim-field">
-            <label class="sim-label" data-i18n="col_edu">Education</label>
-            <select id="simEdu" class="select-control" onchange="runSimulation()">
-              <option value="Bachelors">Bachelors</option>
-              <option value="Masters">Masters</option>
-              <option value="PHD">PHD</option>
-            </select>
-          </div>
-          <div class="sim-field">
-            <label class="sim-label" data-i18n="col_city">City</label>
-            <select id="simCity" class="select-control" onchange="runSimulation()">
-              <option value="Bangalore">Bangalore</option>
-              <option value="Pune" selected>Pune</option>
-              <option value="New Delhi">New Delhi</option>
-            </select>
-          </div>
-          <div class="sim-field">
-            <label class="sim-label" data-i18n="col_tier">Payment Tier</label>
-            <select id="simTier" class="select-control" onchange="runSimulation()">
-              <option value="1">Tier 1 (High)</option>
-              <option value="2" selected>Tier 2 (Mid)</option>
-              <option value="3">Tier 3 (Standard)</option>
-            </select>
-          </div>
-          <div class="sim-field">
-            <label class="sim-label" data-i18n="col_benched">Ever Benched</label>
-            <select id="simBenched" class="select-control" onchange="runSimulation()">
-              <option value="No">No</option>
-              <option value="Yes" selected>Yes</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="sim-result-badge" id="simResultBox">
-          <div>
-            <div style="font-size: 12px; color: var(--text-muted);" data-i18n="sim_prob_label">Estimated Departure Risk</div>
-            <div style="font-family:'Unbounded', sans-serif; font-size:24px; font-weight:800; color:var(--danger);" id="simPercentage">78% Risk</div>
-          </div>
-          <div style="text-align: right; max-width: 240px;">
-            <div style="font-size:12px; font-weight:700; color:var(--danger);" id="simRiskLevel">Critical High</div>
-            <div style="font-size:11px; color:var(--text-muted);" id="simRec">Review compensation tier and domain alignment.</div>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -1621,6 +1579,12 @@
     let currentLang = localStorage.getItem('incluai_lang') || 'en';
     let currentTheme = localStorage.getItem('incluai_theme') || 'cyber-dark';
 
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+      })[char]);
+    }
+
     // Theme Switcher Logic
     function changeTheme(themeId) {
       currentTheme = themeId;
@@ -1677,17 +1641,29 @@
       changeLanguage(currentLang);
 
       try {
-        // Fetch full dataset from API or static mirror
-        let res = await fetch('/api/v2/dataset?limit=all');
+        const token = localStorage.getItem('incluai_token');
+        const notice = document.getElementById('datasetAccessNotice');
+        if (!token) {
+          notice.hidden = false;
+          notice.textContent = 'Sign in as an HR or organization administrator in the Workplace Platform to access workforce data.';
+          return;
+        }
+        const res = await fetch('/api/v2/dataset?limit=all', {
+          headers: { Authorization: 'Bearer ' + token }
+        });
         if (!res.ok) {
-          res = await fetch('/data/employee_attrition.json');
+          notice.hidden = false;
+          notice.textContent = res.status === 401 || res.status === 403
+            ? 'Your account does not have permission to access workforce data. Sign in as HR or an organization administrator.'
+            : 'Workforce data could not be loaded.';
+          return;
         }
         const data = await res.json();
         dataset = Array.isArray(data) ? data : (data.data || []);
         filteredRecords = [...dataset];
 
         // Fetch live stats
-        fetchStats();
+        fetchStats(token);
         renderTable();
         runSimulation();
       } catch (err) {
@@ -1696,9 +1672,11 @@
     }
 
     // Fetch Stats from API
-    async function fetchStats() {
+    async function fetchStats(token) {
       try {
-        const res = await fetch('/api/v2/dataset/stats');
+        const res = await fetch('/api/v2/dataset/stats', {
+          headers: { Authorization: 'Bearer ' + token }
+        });
         const json = await res.json();
         if (json.success && json.stats) {
           const s = json.stats;
@@ -1727,7 +1705,7 @@
           cityHtml += `
             <div class="bar-row">
               <div class="bar-label-group">
-                <span>${city}</span>
+                <span>${escapeHtml(city)}</span>
                 <span class="bar-stat-val">${data.rate}% turnover (${data.total.toLocaleString()} total)</span>
               </div>
               <div class="bar-track"><div class="bar-fill ${fillClass}" style="width: ${data.rate}%;"></div></div>
@@ -1744,7 +1722,7 @@
           eduHtml += `
             <div class="bar-row">
               <div class="bar-label-group">
-                <span>${edu}</span>
+                <span>${escapeHtml(edu)}</span>
                 <span class="bar-stat-val">${data.rate}% turnover (${data.total.toLocaleString()} total)</span>
               </div>
               <div class="bar-track"><div class="bar-fill ${fillClass}" style="width: ${data.rate}%;"></div></div>
@@ -1761,7 +1739,7 @@
           tierHtml += `
             <div class="bar-row">
               <div class="bar-label-group">
-                <span>${tier}</span>
+                <span>${escapeHtml(tier)}</span>
                 <span class="bar-stat-val">${data.rate}% turnover (${data.total.toLocaleString()} total)</span>
               </div>
               <div class="bar-track"><div class="bar-fill ${fillClass}" style="width: ${data.rate}%;"></div></div>
@@ -1888,15 +1866,15 @@
 
         rowsHtml += `
           <tr>
-            <td style="font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim);">#${r.id}</td>
-            <td style="font-weight:600;">${r.Education}</td>
-            <td style="font-family:'JetBrains Mono', monospace;">${r.JoiningYear}</td>
-            <td>${r.City}</td>
-            <td>${tierBadge}</td>
-            <td>${r.Age}</td>
-            <td>${r.Gender}</td>
+            <td style="font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim);">#${escapeHtml(r.id)}</td>
+            <td style="font-weight:600;">${escapeHtml(r.Education)}</td>
+            <td style="font-family:'JetBrains Mono', monospace;">${escapeHtml(r.JoiningYear)}</td>
+            <td>${escapeHtml(r.City)}</td>
+            <td><span class="badge badge-tier">Tier ${escapeHtml(r.PaymentTier)}</span></td>
+            <td>${escapeHtml(r.Age)}</td>
+            <td>${escapeHtml(r.Gender)}</td>
             <td>${benchedBadge}</td>
-            <td>${r.ExperienceInCurrentDomain} yrs</td>
+            <td>${escapeHtml(r.ExperienceInCurrentDomain)} yrs</td>
             <td>${outcomeBadge}</td>
           </tr>
         `;
@@ -1937,41 +1915,7 @@
 
     // AI Simulator
     async function runSimulation() {
-      const Education = document.getElementById('simEdu').value;
-      const City = document.getElementById('simCity').value;
-      const PaymentTier = document.getElementById('simTier').value;
-      const EverBenched = document.getElementById('simBenched').value;
-
-      try {
-        const res = await fetch('/api/v2/dataset/predict', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ Education, City, PaymentTier, EverBenched, JoiningYear: 2018, Age: 28, ExperienceInCurrentDomain: 2 })
-        });
-        const data = await res.json();
-        if (data.success && data.prediction) {
-          const p = data.prediction;
-          document.getElementById('simPercentage').innerText = p.percentage + '% Risk';
-          document.getElementById('simPercentage').style.color = p.color;
-          document.getElementById('simRiskLevel').innerText = p.riskLevel;
-          document.getElementById('simRiskLevel').style.color = p.color;
-          document.getElementById('simRec').innerText = p.recommendation;
-        }
-      } catch (e) {
-        // Local calculation fallback
-        let prob = 35;
-        if (PaymentTier === '2') prob += 25;
-        if (City === 'Pune') prob += 18;
-        if (EverBenched === 'Yes') prob += 15;
-        if (Education === 'Masters') prob += 8;
-        prob = Math.min(95, Math.max(10, prob));
-
-        document.getElementById('simPercentage').innerText = prob + '% Risk';
-        const color = prob >= 65 ? 'var(--danger)' : (prob >= 40 ? 'var(--warning)' : 'var(--accent)');
-        document.getElementById('simPercentage').style.color = color;
-        document.getElementById('simRiskLevel').innerText = prob >= 65 ? 'Critical High' : (prob >= 40 ? 'Moderate' : 'Low');
-        document.getElementById('simRiskLevel').style.color = color;
-      }
+      return;
     }
 
     // Add Record Modal
@@ -1997,9 +1941,10 @@
       };
 
       try {
+        const token = localStorage.getItem('incluai_token');
         const res = await fetch('/api/v2/dataset', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token || '') },
           body: JSON.stringify(newRec)
         });
         const data = await res.json();
@@ -2009,20 +1954,34 @@
           fetchStats();
           closeAddModal();
           alert('Employee record successfully saved to dataset!');
+        } else {
+          alert(data.error || 'The record could not be saved.');
         }
       } catch (err) {
-        // In-memory fallback
-        newRec.id = dataset.length + 1;
-        dataset.unshift(newRec);
-        applyFilters();
-        closeAddModal();
-        alert('Record added in local session.');
+        alert('The record could not be saved because the server is unavailable.');
       }
     }
 
     // Download Dataset
-    function downloadDataset(format) {
-      window.location.href = `/api/v2/dataset/export?format=${format}`;
+    async function downloadDataset(format) {
+      const token = localStorage.getItem('incluai_token');
+      if (!token) {
+        alert('Sign in as HR or an organization administrator to export workforce data.');
+        return;
+      }
+      const res = await fetch(`/api/v2/dataset/export?format=${encodeURIComponent(format)}`, {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      if (!res.ok) {
+        alert('Your account does not have permission to export workforce data.');
+        return;
+      }
+      const url = URL.createObjectURL(await res.blob());
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = format === 'json' ? 'employee_attrition_dataset.json' : 'employee_attrition_dataset.csv';
+      link.click();
+      URL.revokeObjectURL(url);
     }
 
     // =========================================================================

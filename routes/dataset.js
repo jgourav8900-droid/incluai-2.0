@@ -2,9 +2,13 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const { authenticateToken, requireRole } = require('../services/authService');
 
-const dataJsonPath = path.join(__dirname, '..', 'data', 'employee_attrition.json');
-const dataCsvPath = path.join(__dirname, '..', 'data', 'employee_attrition.csv');
+const DATA_DIR = process.env.INCLUAI_DATA_DIR || path.join(__dirname, '..', 'data');
+const dataJsonPath = path.join(DATA_DIR, 'employee_attrition.json');
+const dataCsvPath = path.join(DATA_DIR, 'employee_attrition.csv');
+
+router.use(authenticateToken, requireRole(['HR_Admin', 'Organization_Admin']));
 
 // In-memory cache for fast querying
 let datasetCache = null;
@@ -240,75 +244,10 @@ router.get('/stats', (req, res) => {
 
 // POST /api/v2/dataset/predict - AI Turnover Probability Estimator
 router.post('/predict', (req, res) => {
-  try {
-    const { Education, JoiningYear, City, PaymentTier, Age, Gender, EverBenched, ExperienceInCurrentDomain } = req.body;
-    
-    // Statistical weights derived from the 4,653 dataset records:
-    // Base probability: ~0.34
-    let riskScore = 0.34;
-
-    // Payment tier factor: Tier 1 (0.36) vs Tier 2 (0.59) vs Tier 3 (0.28)
-    if (parseInt(PaymentTier, 10) === 2) riskScore += 0.22;
-    else if (parseInt(PaymentTier, 10) === 1) riskScore += 0.05;
-    else riskScore -= 0.08;
-
-    // Ever benched factor: Yes (~0.45) vs No (~0.32)
-    if (EverBenched === 'Yes') riskScore += 0.14;
-
-    // City factor: Pune has higher attrition (~0.50), Bangalore (~0.27), New Delhi (~0.31)
-    if (City === 'Pune') riskScore += 0.16;
-    else if (City === 'New Delhi') riskScore -= 0.03;
-    else if (City === 'Bangalore') riskScore -= 0.07;
-
-    // Joining year factor: 2018 joins had huge leave rate (~0.98), 2017 (~0.27)
-    if (parseInt(JoiningYear, 10) >= 2018) riskScore += 0.38;
-    else if (parseInt(JoiningYear, 10) <= 2014) riskScore -= 0.06;
-
-    // Gender factor: Females in dataset have slightly higher attrition (~0.47 vs 0.25)
-    if (Gender === 'Female') riskScore += 0.12;
-    else riskScore -= 0.08;
-
-    // Education factor: Masters (~0.39), Bachelors (~0.34), PHD (~0.25)
-    if (Education === 'Masters') riskScore += 0.05;
-    else if (Education === 'PHD') riskScore -= 0.09;
-
-    // Age factor
-    const ageNum = parseInt(Age, 10) || 28;
-    if (ageNum < 25) riskScore += 0.06;
-    else if (ageNum > 35) riskScore -= 0.05;
-
-    // Clamp between 0.04 and 0.96
-    const finalProb = Math.min(0.96, Math.max(0.04, riskScore));
-    const percentage = Math.round(finalProb * 100);
-
-    let riskLevel = 'Low';
-    let recommendation = 'Standard talent retention cadence recommended.';
-    let color = '#19f0c4';
-
-    if (percentage >= 65) {
-      riskLevel = 'Critical High';
-      recommendation = 'Immediate engagement review! Discuss growth pathway, compensation tier, and project benchmarking.';
-      color = '#ff3b5c';
-    } else if (percentage >= 40) {
-      riskLevel = 'Moderate';
-      recommendation = 'Schedule 1-on-1 check-in. Review workload and domain alignment.';
-      color = '#ff8a1f';
-    }
-
-    res.json({
-      success: true,
-      prediction: {
-        probability: finalProb,
-        percentage,
-        riskLevel,
-        recommendation,
-        color,
-        inputs: { Education, JoiningYear, City, PaymentTier, Age, Gender, EverBenched, ExperienceInCurrentDomain }
-      }
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, error: 'Prediction error: ' + err.message });
-  }
+  res.status(410).json({
+    success: false,
+    error: 'Individual employee attrition scoring is disabled. Use aggregate workforce statistics for planning, not employment decisions.'
+  });
 });
 
 // POST /api/v2/dataset - Add new record
@@ -316,8 +255,25 @@ router.post('/', (req, res) => {
   try {
     const { Education, JoiningYear, City, PaymentTier, Age, Gender, EverBenched, ExperienceInCurrentDomain, LeaveOrNot } = req.body;
 
-    if (!Education || !City || !Gender || JoiningYear === undefined) {
-      return res.status(400).json({ success: false, error: 'Required fields missing.' });
+    const stringFields = [Education, City, Gender, EverBenched];
+    if (stringFields.some(value => typeof value !== 'string' || value.trim().length === 0)) {
+      return res.status(400).json({ success: false, error: 'Education, city, gender, and bench status are required.' });
+    }
+
+    const numeric = {
+      JoiningYear: Number(JoiningYear),
+      PaymentTier: Number(PaymentTier),
+      Age: Number(Age),
+      ExperienceInCurrentDomain: Number(ExperienceInCurrentDomain),
+      LeaveOrNot: Number(LeaveOrNot)
+    };
+    if (!Number.isInteger(numeric.JoiningYear) || numeric.JoiningYear < 1980 || numeric.JoiningYear > new Date().getFullYear() + 1 ||
+        !Number.isInteger(numeric.PaymentTier) || numeric.PaymentTier < 1 || numeric.PaymentTier > 3 ||
+        !Number.isInteger(numeric.Age) || numeric.Age < 16 || numeric.Age > 100 ||
+        !Number.isInteger(numeric.ExperienceInCurrentDomain) || numeric.ExperienceInCurrentDomain < 0 || numeric.ExperienceInCurrentDomain > 80 ||
+        ![0, 1].includes(numeric.LeaveOrNot) ||
+        !['Yes', 'No'].includes(EverBenched)) {
+      return res.status(400).json({ success: false, error: 'One or more record values are outside the allowed range.' });
     }
 
     const records = loadDataset();
@@ -325,15 +281,15 @@ router.post('/', (req, res) => {
 
     const newRecord = {
       id: newId,
-      Education: Education.trim(),
-      JoiningYear: parseInt(JoiningYear, 10) || new Date().getFullYear(),
+      Education: Education.trim().slice(0, 100),
+      JoiningYear: numeric.JoiningYear,
       City: City.trim(),
-      PaymentTier: parseInt(PaymentTier, 10) || 3,
-      Age: parseInt(Age, 10) || 28,
+      PaymentTier: numeric.PaymentTier,
+      Age: numeric.Age,
       Gender: Gender.trim(),
-      EverBenched: EverBenched === 'Yes' ? 'Yes' : 'No',
-      ExperienceInCurrentDomain: parseInt(ExperienceInCurrentDomain, 10) || 0,
-      LeaveOrNot: parseInt(LeaveOrNot, 10) || 0
+      EverBenched,
+      ExperienceInCurrentDomain: numeric.ExperienceInCurrentDomain,
+      LeaveOrNot: numeric.LeaveOrNot
     };
 
     records.unshift(newRecord);

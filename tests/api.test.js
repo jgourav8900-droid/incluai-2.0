@@ -1,4 +1,7 @@
 process.env.NODE_ENV = 'test';
+const cleanupTestData = require('./testData').createTestData();
+const crypto = require('crypto');
+const db = require('../services/dbService');
 const app = require('../server');
 const http = require('http');
 
@@ -94,13 +97,55 @@ async function runTests() {
     });
     assert(dupSignup.status === 409, 'Sign up rejects duplicate email with 409 Conflict');
 
-    // 5. Login with existing employee
+    // 5. Existing PBKDF2 accounts remain usable and upgrade after a valid login.
+    db.update('users', u => u.email === 'emp@comp001.internal', u => ({
+      ...u,
+      passwordHash: crypto.pbkdf2Sync('password123', 'incluai_default_salt_2026', 1000, 64, 'sha512').toString('hex')
+    }));
     const loginRes = await request('POST', '/api/v2/auth/login', {
       email: 'emp@comp001.internal',
       password: 'password123'
     });
-    assert(loginRes.status === 200 && loginRes.body.token, 'Employee login succeeds and returns JWT token');
+    assert(
+      loginRes.status === 200 && loginRes.body.token &&
+      db.findOne('users', u => u.email === 'emp@comp001.internal').passwordHash.startsWith('scrypt$'),
+      'Employee login upgrades the legacy password hash'
+    );
     const empToken = loginRes.body.token;
+
+    const hrLoginRes = await request('POST', '/api/v2/auth/login', {
+      email: 'hr@comp001.internal',
+      password: 'password123'
+    });
+    const hrToken = hrLoginRes.body.token;
+    assert(hrLoginRes.status === 200 && hrToken, 'HR admin login succeeds');
+
+    // Dataset is private and limited to HR/admin; never fall back to a public data file.
+    const publicDatasetRes = await request('GET', '/api/v2/dataset');
+    const employeeDatasetRes = await request('GET', '/api/v2/dataset', null, empToken);
+    const hrDatasetRes = await request('GET', '/api/v2/dataset?limit=all', null, hrToken);
+    const exposedDbRes = await request('GET', '/data/db.json');
+    const exposedSourceRes = await request('GET', '/server.js');
+    assert(publicDatasetRes.status === 401, 'Dataset API rejects unauthenticated reads');
+    assert(employeeDatasetRes.status === 403, 'Dataset API restricts employee reads to HR/admin');
+    assert(hrDatasetRes.status === 200 && hrDatasetRes.body.total === 2, 'Authorized HR access returns dataset records');
+    assert(exposedDbRes.status === 404 && exposedSourceRes.status === 404, 'Static server does not expose database or source files');
+    const unauthorizedDatasetWrite = await request('POST', '/api/v2/dataset', {
+      Education: 'Bachelors', JoiningYear: 2020, City: 'Bangalore', PaymentTier: 3,
+      Age: 30, Gender: 'Female', EverBenched: 'No',
+      ExperienceInCurrentDomain: 5, LeaveOrNot: 0
+    }, empToken);
+    assert(unauthorizedDatasetWrite.status === 403, 'Dataset API rejects employee writes');
+    const invalidDatasetWrite = await request('POST', '/api/v2/dataset', {
+      Education: 'Bachelors', JoiningYear: 2020, City: 'Bangalore', PaymentTier: 9,
+      Age: 30, Gender: 'Female', EverBenched: 'No',
+      ExperienceInCurrentDomain: 5, LeaveOrNot: 0
+    }, hrToken);
+    assert(invalidDatasetWrite.status === 400, 'Dataset API validates record field bounds');
+    const disabledPrediction = await request('POST', '/api/v2/dataset/predict', {
+      Gender: 'Female', Age: 30
+    }, hrToken);
+    assert(disabledPrediction.status === 410, 'Individual attrition predictions are disabled');
 
     // 6. Dashboard Analytics endpoint
     const dashRes = await request('GET', '/api/v2/analytics/dashboard', null, empToken);
@@ -163,12 +208,11 @@ async function runTests() {
       msg: 'Need this space desperately'
     });
     assert(
-      waitlistRes.status === 201 && 
-      waitlistRes.body.token && 
+      waitlistRes.status === 201 &&
+      !waitlistRes.body.token &&
       waitlistRes.body.member.spotNumber >= 249,
-      'Waitlist spot reservation creates member and issues cryptographic JWT token'
+      'Waitlist signup saves an early-access reservation without issuing a workplace token'
     );
-    const earlyToken = waitlistRes.body.token;
 
     // 14. Waitlist Public Stats Telemetry
     const statsRes = await request('GET', '/api/v2/waitlist/stats');
@@ -189,8 +233,8 @@ async function runTests() {
     assert(
       duplicateWaitlistRes.status === 200 && 
       duplicateWaitlistRes.body.alreadyRegistered === true && 
-      duplicateWaitlistRes.body.token === earlyToken,
-      'Waitlist idempotently recognizes existing member and returns their VIP token'
+      !duplicateWaitlistRes.body.token,
+      'Waitlist duplicate lookup does not disclose a stored access token'
     );
 
     // 16. WebGL Cinematic UI Landing Page Route
@@ -352,12 +396,6 @@ async function runTests() {
     // ── PHASE C: ADVANCED AI FEATURES TESTS ───────────────────────────────
 
     // Login HR Admin for admin-scoped features
-    const hrLoginRes = await request('POST', '/api/v2/auth/login', {
-      email: 'hr@comp001.internal',
-      password: 'password123'
-    });
-    const hrToken = hrLoginRes.body.token;
-
     // 26. AI Meeting Assistant: Summarize Transcript
     const meetingRes = await request('POST', '/api/v2/copilot/advanced/meeting-summary', {
       meetingTitle: 'Q4 Inclusive Engineering Sync',
@@ -437,6 +475,21 @@ async function runTests() {
       !anonReportRes.body.report.userIp,
       'Anonymous reporting guarantees true server-side anonymity with zero submitter PII'
     );
+    const employeeReportsRes = await request('GET', '/api/v2/reports', null, empToken);
+    const hrReportsRes = await request('GET', '/api/v2/reports', null, hrToken);
+    assert(
+      employeeReportsRes.status === 200 && !employeeReportsRes.body.reports.some(report => report.isAnonymous),
+      'Employees cannot list anonymous workplace reports'
+    );
+    assert(
+      hrReportsRes.status === 200 && hrReportsRes.body.reports.some(report => report.isAnonymous),
+      'HR admins can review anonymous workplace reports'
+    );
+
+    const employeeUploadRes = await request('POST', '/api/v2/knowledge/upload', {
+      title: 'Unauthorized policy', content: 'This content must not be added.'
+    }, empToken);
+    assert(employeeUploadRes.status === 403, 'Employee role cannot upload company knowledge');
 
     // 32. Multi-tenant Data Isolation: Users cannot read records of other companies
     // Sign up a user in an isolated company COMP999
@@ -478,6 +531,7 @@ async function runTests() {
     failed++;
   } finally {
     server.close(() => {
+      cleanupTestData();
       console.log(`\nTEST SUMMARY: ${passed} Passed, ${failed} Failed`);
       process.exit(failed > 0 ? 1 : 0);
     });

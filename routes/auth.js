@@ -1,14 +1,24 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const db = require('../services/dbService');
 const { generateToken, authenticateToken } = require('../services/authService');
 
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === 'test',
+  message: { success: false, error: 'Too many authentication attempts. Please try again later.' }
+});
+
 // POST /api/v2/auth/signup
-router.post('/signup', (req, res) => {
+router.post('/signup', authLimiter, (req, res) => {
   const { name, email, password, confirmPassword, companyName, role } = req.body;
 
   // Validation
-  if (!name || !email || !password || !companyName) {
+  if ([name, email, password, companyName].some(value => typeof value !== 'string' || value.trim().length === 0)) {
     return res.status(400).json({
       success: false,
       error: 'Name, email, password, and company name are required.'
@@ -25,10 +35,10 @@ router.post('/signup', (req, res) => {
   }
 
   // Password length validation
-  if (password.length < 6) {
+  if (password.length < 8 || password.length > 1024) {
     return res.status(400).json({
       success: false,
-      error: 'Password must be at least 6 characters long.'
+      error: 'Password must be between 8 and 1024 characters long.'
     });
   }
 
@@ -103,10 +113,10 @@ router.post('/signup', (req, res) => {
 });
 
 // POST /api/v2/auth/login
-router.post('/login', (req, res) => {
+router.post('/login', authLimiter, (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  if (typeof email !== 'string' || typeof password !== 'string' || !email.trim() || !password || password.length > 1024) {
     return res.status(400).json({
       success: false,
       error: 'Email and password are required.'
@@ -121,12 +131,17 @@ router.post('/login', (req, res) => {
     });
   }
 
-  const hashedPassword = db.hashPassword(password);
-  if (user.passwordHash !== hashedPassword) {
+  const passwordCheck = db.verifyPassword(password, user.passwordHash);
+  if (!passwordCheck.valid || (process.env.NODE_ENV === 'production' &&
+      ['emp@comp001.internal', 'hr@comp001.internal', 'admin@comp001.internal'].includes(user.email.toLowerCase()))) {
     return res.status(401).json({
       success: false,
       error: 'Invalid email or password.'
     });
+  }
+
+  if (passwordCheck.needsUpgrade) {
+    db.update('users', u => u.id === user.id, u => ({ ...u, passwordHash: db.hashPassword(password) }));
   }
 
   const token = generateToken(user);
@@ -220,7 +235,7 @@ router.put('/password', authenticateToken, (req, res) => {
   }
 
   const user = db.findOne('users', u => u.id === req.user.id);
-  if (!user || user.passwordHash !== db.hashPassword(currentPassword)) {
+  if (!user || !db.verifyPassword(currentPassword, user.passwordHash).valid) {
     return res.status(401).json({ success: false, error: 'Incorrect current password.' });
   }
 
@@ -237,6 +252,9 @@ router.put('/password', authenticateToken, (req, res) => {
 
 // GET /api/v2/auth/demo-accounts
 router.get('/demo-accounts', (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(404).json({ success: false, error: 'Demo accounts are not available.' });
+  }
   res.json({
     success: true,
     accounts: [
