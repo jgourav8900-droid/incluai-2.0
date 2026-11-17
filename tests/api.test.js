@@ -2,6 +2,8 @@ process.env.NODE_ENV = 'test';
 const cleanupTestData = require('./testData').createTestData();
 const crypto = require('crypto');
 const db = require('../services/dbService');
+const { generateToken } = require('../services/authService');
+const aiService = require('../services/aiService');
 const app = require('../server');
 const http = require('http');
 
@@ -308,6 +310,63 @@ async function runTests() {
       (copilotStatusRes.body.provider === 'Google Gemini' || copilotStatusRes.body.provider === 'Offline fallback'),
       'Copilot status endpoint returns correct provider label'
     );
+    const orgAdminToken = generateToken({
+      id: 'test-org-admin',
+      companyId: 'COMP001',
+      employeeId: 'ADMIN001',
+      email: 'org-admin@testcorp.internal',
+      role: 'Organization_Admin',
+      name: 'Test Organization Admin',
+      department: 'Administration'
+    });
+    const rejectedAnthropicUserToken = await request('POST', '/api/v2/copilot/config', {
+      provider: 'anthropic',
+      apiKey: 'sk-ant-usr-test-session-token'
+    }, orgAdminToken);
+    assert(
+      rejectedAnthropicUserToken.status === 400 &&
+      rejectedAnthropicUserToken.body.error.includes('account or session token'),
+      'Copilot provider config rejects Anthropic account/session tokens'
+    );
+    const savedProviderEnv = {
+      AI_PROVIDER: process.env.AI_PROVIDER,
+      ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+      ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL,
+      GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY
+    };
+    const originalFetch = global.fetch;
+    try {
+      global.fetch = async (url, options) => {
+        assert(url === 'https://api.anthropic.com/v1/messages', 'Provider verification uses the fixed Anthropic endpoint');
+        assert(options.headers['x-api-key'] === 'sk-ant-api-test-placeholder', 'Provider verification sends the configured test key');
+        return {
+          ok: true,
+          json: async () => ({ content: [{ type: 'text', text: 'ready' }] })
+        };
+      };
+      const configuredAnthropic = await request('POST', '/api/v2/copilot/config', {
+        provider: 'anthropic',
+        apiKey: 'sk-ant-api-test-placeholder',
+        model: 'claude-test-model'
+      }, orgAdminToken);
+      assert(
+        configuredAnthropic.status === 200 &&
+        configuredAnthropic.body.status.provider === 'Anthropic Claude' &&
+        configuredAnthropic.body.status.connected === true &&
+        configuredAnthropic.body.persistence === 'runtime-only' &&
+        !JSON.stringify(configuredAnthropic.body).includes('sk-ant-api-test-placeholder'),
+        'Organization Admin can verify Claude configuration without exposing or persisting its key'
+      );
+    } finally {
+      global.fetch = originalFetch;
+      for (const [name, value] of Object.entries(savedProviderEnv)) {
+        if (value === undefined) delete process.env[name];
+        else process.env[name] = value;
+      }
+      aiService.isProviderVerified = false;
+      aiService.initGeminiClient(false);
+    }
 
     // 19c. Copilot greeting handler ("hello")
     const copilotHelloRes = await request('POST', '/api/v2/copilot/chat', {

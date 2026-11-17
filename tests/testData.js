@@ -3,6 +3,10 @@ const os = require('os');
 const path = require('path');
 
 function createTestData() {
+  process.env.AI_PROVIDER = '';
+  process.env.ANTHROPIC_API_KEY = '';
+  process.env.GEMINI_API_KEY = '';
+  process.env.GOOGLE_API_KEY = '';
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'incluai-test-db-'));
   const datasetDir = fs.mkdtempSync(path.join(os.tmpdir(), 'incluai-test-dataset-'));
   fs.writeFileSync(path.join(datasetDir, 'employee_attrition.json'), JSON.stringify([

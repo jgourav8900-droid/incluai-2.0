@@ -1955,9 +1955,9 @@
             <div style="display:flex; align-items:center; gap:10px;">
               <span class="badge badge-green" id="copilotStatusBadge" style="display:inline-flex; align-items:center; gap:6px; padding:6px 14px;">
                 <span style="width:7px; height:7px; border-radius:50%; background:#19f0c4; box-shadow:0 0 10px #19f0c4; display:inline-block;"></span>
-                <span id="copilotStatusText">Google Gemini 2.0 Flash Connected</span>
+                <span id="copilotStatusText">AI provider status loading</span>
               </span>
-              <button class="btn btn-outline btn-sm" onclick="promptGeminiApiKey()" title="Configure Live Gemini API Key">⚙️ Gemini API</button>
+              <button class="btn btn-outline btn-sm" onclick="promptAIProviderKey()" title="Configure a hosted AI provider">⚙️ AI Provider</button>
             </div>
           </div>
 
@@ -3080,19 +3080,19 @@
             if (data.liveAvailable) {
               badge.textContent = 'Google Gemini Live (Voice & Text Ready)';
             } else if (data.hasApiKey) {
-              badge.textContent = 'Google Gemini (text mode)';
+              badge.textContent = `${data.provider} (${data.connected ? 'text mode' : 'configured'})`;
             } else {
               badge.textContent = 'Neural RAG (Fast Mode)';
             }
           }
           const micBtn = document.getElementById('liveMicBtn');
           if (micBtn) {
-            if (data.hasApiKey) {
+            if (data.liveAvailable) {
               micBtn.style.opacity = '1';
               micBtn.title = 'Start Spoken Voice Conversation with Gemini Live';
             } else {
               micBtn.style.opacity = '0.75';
-              micBtn.title = 'Voice requires GEMINI_API_KEY in server environment.';
+              micBtn.title = 'Voice mode requires a configured Google Gemini Live provider.';
             }
           }
         }
@@ -3506,8 +3506,15 @@
     }
 
 
-    async function promptGeminiApiKey() {
-      const key = prompt('Enter Google Gemini API Key (leaves empty to keep current):');
+    async function promptAIProviderKey() {
+      const provider = prompt('Choose provider: gemini or anthropic');
+      if (provider === null || !provider.trim()) return;
+      const providerId = provider.trim().toLowerCase();
+      if (!['gemini', 'anthropic', 'claude'].includes(providerId)) {
+        alert('Choose either gemini or anthropic.');
+        return;
+      }
+      const key = prompt(`Enter the ${providerId === 'gemini' ? 'Google Gemini' : 'Anthropic Claude'} API key:`);
       if (key !== null && key.trim()) {
         try {
           const res = await fetch('/api/v2/copilot/config', {
@@ -3516,13 +3523,18 @@
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${authToken}`
             },
-            body: JSON.stringify({ apiKey: key.trim(), model: 'gemini-2.0-flash' })
+            body: JSON.stringify({
+              provider: providerId,
+              apiKey: key.trim(),
+              model: providerId === 'gemini' ? 'gemini-2.0-flash' : 'claude-sonnet-4-5'
+            })
           });
           const data = await res.json();
-          alert(data.message || 'Gemini configured!');
+          if (!res.ok || !data.success) throw new Error(data.error || 'Could not configure the AI provider.');
+          alert(`${data.message} Configuration lasts until the server restarts.`);
           checkGeminiStatus();
         } catch (e) {
-          alert('Config error: ' + e.message);
+          alert('AI provider configuration error: ' + e.message);
         }
       }
     }

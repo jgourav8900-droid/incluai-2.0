@@ -9,11 +9,12 @@
  *  - Smart recommendations (context-based action suggestions)
  *  - Proper error handling (no fake responses on failure)
  *
- * NOTE: Gemini API key must be set in .env as GEMINI_API_KEY.
- *       Without it, the service falls back to Neural RAG (Fast Mode).
+ * NOTE: Set AI_PROVIDER with its corresponding API key to use a hosted model.
+ *       Without a provider key, the service falls back to Neural RAG (Fast Mode).
  */
 
 const { GoogleGenAI } = require('@google/genai');
+const modelProvider = require('./modelProvider');
 const ragService = require('./ragService');
 const conversationService = require('./conversationService');
 const db = require('./dbService');
@@ -65,7 +66,7 @@ function classifyIntent(lower) {
 
 // ── Project-aware system prompt ───────────────────────────────────────────────
 function buildSystemPrompt(name, role, department, employeeId, policyContext) {
-  return `You are the INCLUAI 2.0 Enterprise Workplace Intelligence Copilot — an AI assistant powered by Google Gemini, embedded in the INCLUAI workplace intelligence platform.
+  return `You are the INCLUAI 2.0 Enterprise Workplace Intelligence Copilot, embedded in the INCLUAI workplace intelligence platform.
 
 ## User Context
 - Name: ${name}
@@ -155,30 +156,36 @@ class AIService {
   constructor() {
     this.geminiClient = null;
     this.isGeminiVerified = null;
+    this.isProviderVerified = false;
     this.initGeminiClient();
   }
 
   getApiKey() {
-    const key = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
+    const config = modelProvider.getProviderConfig();
+    if (config.id !== 'gemini') return null;
+    const key = config.apiKey;
     if (key.trim().length > 5 && !key.startsWith('YOUR_')) return key.trim();
     return null;
   }
 
-  initGeminiClient() {
+  initGeminiClient(verify = true) {
     const apiKey = this.getApiKey();
     if (!apiKey) {
       this.geminiClient = null;
       this.isGeminiVerified = false;
-      console.log('[AIService] No GEMINI_API_KEY, running offline fallback.');
+      if (!modelProvider.isConfigured()) {
+        console.log('[AIService] No hosted AI key, running offline fallback.');
+      } else {
+        console.log('[AIService] Gemini Live voice is unavailable for the selected provider.');
+      }
       return;
     }
     try {
       this.geminiClient = new GoogleGenAI({ apiKey });
       this.isGeminiVerified = null;
       const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
-      const maskedKey = apiKey.length > 8 ? `${apiKey.slice(0, 4)}...${apiKey.slice(-4)}` : '****';
-      console.log(`[AIService] Gemini ready, model=${model} (key: ${maskedKey})`);
-      this.verifyGemini().catch(() => {});
+      console.log(`[AIService] Gemini ready, model=${model}.`);
+      if (verify) this.verifyGemini().catch(() => {});
     } catch (err) {
       console.error('[AIService] Failed to init Gemini client:', err.message);
       this.geminiClient = null;
@@ -211,21 +218,43 @@ class AIService {
     }
   }
 
+  async verifyProvider() {
+    if (!modelProvider.isConfigured()) {
+      this.isProviderVerified = false;
+      return false;
+    }
+    try {
+      const response = await modelProvider.generate({
+        contents: [{ role: 'user', parts: [{ text: 'ping' }] }],
+        maxOutputTokens: 8
+      });
+      this.isProviderVerified = Boolean(response.text);
+      if (modelProvider.getProviderConfig().id === 'gemini') {
+        this.isGeminiVerified = this.isProviderVerified;
+      }
+      return this.isProviderVerified;
+    } catch (err) {
+      console.warn('[AIService] AI provider verification failed:', err.message);
+      this.isProviderVerified = false;
+      return false;
+    }
+  }
+
   getStatus() {
-    const hasKey = !!this.getApiKey();
+    const config = modelProvider.getProviderConfig();
+    const hasKey = !!config.apiKey;
     const liveModel = process.env.GEMINI_LIVE_MODEL || 'gemini-2.0-flash';
-    const isWorking = hasKey && !!this.geminiClient && this.isGeminiVerified === true;
-    const provider = isWorking ? 'Google Gemini' : 'Offline fallback';
+    const liveAvailable = config.id === 'gemini' && !!this.geminiClient && this.isGeminiVerified === true;
 
     return {
       success: true,
-      provider,
-      connected: isWorking,
+      provider: hasKey ? config.name : 'Offline fallback',
+      connected: hasKey && this.isProviderVerified,
       hasApiKey: hasKey,
-      liveAvailable: isWorking && !!process.env.GEMINI_LIVE_MODEL,
+      liveAvailable,
       liveModel,
-      model: process.env.GEMINI_MODEL || DEFAULT_MODEL,
-      mode: isWorking ? 'live-api' : 'offline-fallback',
+      model: config.model,
+      mode: hasKey ? (this.isProviderVerified ? 'live-api' : 'configured') : 'offline-fallback',
       capabilities: [
         'General Q&A',
         'HR Policy Q&A',
@@ -281,8 +310,8 @@ class AIService {
     let provider = 'Neural RAG (Fast Mode)';
     let errorDetail = null;
 
-    // ── Live Gemini path ─────────────────────────────────────────────────
-    if (this.geminiClient) {
+    // ── Configured language model path ──────────────────────────────────
+    if (modelProvider.isConfigured()) {
       try {
         const policyContext = retrievedDocs.slice(0, 4)
           .map(d => `--- DOCUMENT: ${d.title} (${d.section}) ---\n${d.content}`)
@@ -290,23 +319,25 @@ class AIService {
 
         const systemInstruction = buildSystemPrompt(name, role, department, employeeId, policyContext);
 
-        const response = await this.geminiClient.models.generateContent({
-          model: process.env.GEMINI_MODEL || DEFAULT_MODEL,
+        const response = await modelProvider.generate({
           contents: [...priorTurns, { role: 'user', parts: [{ text: cleanPrompt }] }],
-          config: { systemInstruction, temperature: 0.15, maxOutputTokens: 1024 }
+          systemInstruction,
+          temperature: 0.15,
+          maxOutputTokens: 1024
         });
 
         if (response?.text && response.text.trim().length > 0) {
           responseText = response.text.trim();
-          provider = 'Google Gemini (Live)';
-          this.isGeminiVerified = true;
+          provider = response.provider;
+          this.isProviderVerified = true;
         } else {
-          errorDetail = 'Gemini returned empty response.';
+          errorDetail = 'The configured AI provider returned an empty response.';
+          this.isProviderVerified = false;
         }
       } catch (err) {
         errorDetail = err.message;
-        console.warn('[AIService] Gemini call failed, using fast mode:', err.message);
-        this.isGeminiVerified = false;
+        console.warn('[AIService] AI provider call failed, using fast mode:', err.message);
+        this.isProviderVerified = false;
       }
     }
 
@@ -377,7 +408,7 @@ class AIService {
     let answer = '';
     let citation = null;
 
-    if (this.geminiClient && topDoc) {
+    if (modelProvider.isConfigured() && topDoc) {
       try {
         const context = relevantDocs.slice(0, 3)
           .map(d => `--- ${d.title} (${d.section}) ---\n${d.content}`)
@@ -396,18 +427,21 @@ Rules:
 - Never guess or extrapolate policy terms
 - Be concise and empathetic`;
 
-        const response = await this.geminiClient.models.generateContent({
-          model: process.env.GEMINI_MODEL || DEFAULT_MODEL,
+        const response = await modelProvider.generate({
           contents: [{ role: 'user', parts: [{ text: question }] }],
-          config: { systemInstruction, temperature: 0.05, maxOutputTokens: 512 }
+          systemInstruction,
+          temperature: 0.05,
+          maxOutputTokens: 512
         });
 
         if (response?.text) {
           answer = response.text.trim();
+          this.isProviderVerified = true;
           citation = { title: topDoc.title, section: topDoc.section, score: topDoc.score };
         }
       } catch (err) {
-        console.warn('[AIService] HR Policy Gemini failed:', err.message);
+        this.isProviderVerified = false;
+        console.warn('[AIService] HR Policy AI provider failed:', err.message);
       }
     }
 
@@ -420,7 +454,15 @@ Rules:
       answer = `I couldn't find a specific HR policy document matching your question. Please contact HR directly via **/app → Messages** or browse the Knowledge Base at **/app → Knowledge**.`;
     }
 
-    return { success: true, question, answer, citation, provider: this.geminiClient ? 'Google Gemini (Live)' : 'Neural RAG (Fast Mode)' };
+    return {
+      success: true,
+      question,
+      answer,
+      citation,
+      provider: this.isProviderVerified
+        ? `${modelProvider.getProviderConfig().name} (Live)`
+        : 'Neural RAG (Fast Mode)'
+    };
   }
 
   // ── Conversation history retrieval ────────────────────────────────────────
@@ -441,12 +483,12 @@ Rules:
 
     // 2. Common general concepts (offline fallback)
     if (lower.includes('swot')) {
-      return `A **SWOT analysis** is a strategic planning framework used to evaluate four key dimensions: **Strengths** (internal advantages), **Weaknesses** (internal vulnerabilities), **Opportunities** (external favorable factors), and **Threats** (external competitive risks).\n\n*(Note: Running in offline fallback mode. Connect Google Gemini API for live reasoning across any general subject.)*`;
+      return `A **SWOT analysis** is a strategic planning framework used to evaluate four key dimensions: **Strengths** (internal advantages), **Weaknesses** (internal vulnerabilities), **Opportunities** (external favorable factors), and **Threats** (external competitive risks).\n\n*(Note: Running in offline fallback mode. Ask an Organization Admin to configure a hosted AI provider for live reasoning across general subjects.)*`;
     }
 
     // 3. Platform features & navigation intents
     if (intent.isDataset) return `Your **Dataset Explorer** is at **/dataset**, or open **/app → Dataset** tab. View, filter, and export employee records there.`;
-    if (intent.isSettings) return `**Settings** are at **/app → Settings**.\n\n• Add your Gemini API key there to enable live AI responses.\n• Adjust accessibility: high contrast, dyslexia font, reduced motion.\n• Manage notifications and profile details.`;
+    if (intent.isSettings) return `**Settings** are at **/app → Settings**.\n\n• An Organization Admin can configure a hosted Gemini or Claude provider for live AI responses.\n• Adjust accessibility: high contrast, dyslexia font, reduced motion.\n• Manage notifications and profile details.`;
     if (intent.isAnalytics) return `**Reports & Analytics** are at **/app → Reports**.\n\nLive telemetry is also available at \`GET /api/v2/analytics/public\`.`;
     if (intent.isPrivacy) return `Anonymous reports strip your user ID, employee number, IP address, and session tokens before storage. Only designated HR Ethics personnel receive the report.\n\nSee the **Workplace Inclusion & Safe Reporting Charter** in the Knowledge Base for full details.`;
     if (intent.isCopilot) return `I'm the **INCLUAI AI Copilot**. I can help you:\n\n• **Answer HR policy questions** — leave, remote work, parental leave, benefits\n• **Draft professional emails** — leave requests, HR queries\n• **Rewrite messages** — more inclusive, professional tone\n• **Navigate the platform** — find any feature\n• **File reports** — anonymous or identified\n• **Smart recommendations** — based on your context\n\nTry: *"How many paid leaves do I get?"* or *"Draft an email requesting 3 days leave"*`;
@@ -479,7 +521,7 @@ Rules:
     }
 
     // 6. Conversational / general fallback (never say "couldn't find" for normal questions)
-    return `I am currently operating in offline fallback mode. I can assist you with company policy guidelines (leave, remote work, parental leave), platform navigation, task tracking, and email drafting.\n\nTo enable live generative answers for any general question, ensure your Google Gemini API key is configured in **Settings**.`;
+    return `I am currently operating in offline fallback mode. I can assist you with company policy guidelines (leave, remote work, parental leave), platform navigation, task tracking, and email drafting.\n\nTo enable live generative answers for general questions, ask an Organization Admin to configure a hosted Gemini or Claude provider.`;
   }
 
   // ── Email draft builder ───────────────────────────────────────────────────

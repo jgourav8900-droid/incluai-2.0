@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const aiService = require('../services/aiService');
-const { authenticateToken } = require('../services/authService');
+const modelProvider = require('../services/modelProvider');
+const { authenticateToken, requireRole } = require('../services/authService');
 
 // Rate limiting: 60 requests per minute per IP for chat & AI generation
 const copilotLimiter = rateLimit({
@@ -18,9 +19,6 @@ const copilotLimiter = rateLimit({
 
 // GET /api/v2/copilot/status
 router.get('/status', async (req, res) => {
-  if (aiService.geminiClient && aiService.isGeminiVerified === null) {
-    await aiService.verifyGemini();
-  }
   res.json(aiService.getStatus());
 });
 
@@ -40,21 +38,51 @@ router.get('/history', authenticateToken, (req, res) => {
   }
 });
 
-// POST /api/v2/copilot/config (Set Gemini API key dynamically - Admin only)
-const { requireRole } = require('../services/authService');
-router.post('/config', authenticateToken, requireRole(['Organization_Admin']), (req, res) => {
+// POST /api/v2/copilot/config (Set a hosted AI provider dynamically - Admin only)
+router.post('/config', authenticateToken, requireRole(['Organization_Admin']), async (req, res) => {
   const { apiKey, model } = req.body;
-  if (apiKey) {
+  const provider = String(req.body.provider || 'gemini').trim().toLowerCase();
+  if (typeof apiKey !== 'string' || !apiKey.trim()) {
+    return res.status(400).json({ success: false, error: 'A provider API key is required.' });
+  }
+  if (provider === 'anthropic' || provider === 'claude') {
+    const key = apiKey.trim();
+    if (!modelProvider.isValidApiKey('anthropic', key)) {
+      return res.status(400).json({ success: false, error: 'Use an Anthropic API key, not an account or session token.' });
+    }
+    process.env.ANTHROPIC_API_KEY = key;
+    process.env.AI_PROVIDER = 'anthropic';
+    delete process.env.GEMINI_API_KEY;
+    delete process.env.GOOGLE_API_KEY;
+    delete process.env.GEMINI_MODEL;
+    if (model) process.env.ANTHROPIC_MODEL = String(model).trim();
+  } else if (provider === 'gemini' || provider === 'google') {
+    if (!modelProvider.isValidApiKey('gemini', apiKey)) {
+      return res.status(400).json({ success: false, error: 'The Gemini API key is invalid.' });
+    }
     process.env.GEMINI_API_KEY = apiKey.trim();
+    process.env.AI_PROVIDER = 'gemini';
+    delete process.env.ANTHROPIC_API_KEY;
+    delete process.env.ANTHROPIC_MODEL;
+    if (model) process.env.GEMINI_MODEL = String(model).trim();
+  } else {
+    return res.status(400).json({ success: false, error: 'Provider must be "gemini" or "anthropic".' });
   }
-  if (model) {
-    process.env.GEMINI_MODEL = model.trim();
+  aiService.isProviderVerified = false;
+  aiService.initGeminiClient(false);
+  const connected = await aiService.verifyProvider();
+  if (!connected) {
+    return res.status(502).json({
+      success: false,
+      error: 'The provider could not be verified. Check the API key, model, and network, then try again.',
+      status: aiService.getStatus()
+    });
   }
-  aiService.initGeminiClient();
   res.json({
     success: true,
-    message: 'Google Gemini configuration updated successfully',
-    status: aiService.getStatus()
+    message: `${modelProvider.getProviderConfig().name} configured for this server process.`,
+    status: aiService.getStatus(),
+    persistence: 'runtime-only'
   });
 });
 

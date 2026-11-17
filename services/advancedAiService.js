@@ -9,37 +9,10 @@
  * 5. Accessibility Assistant: Evaluates workplace & digital descriptions against WCAG 2.1 AA benchmarks
  */
 
-const { GoogleGenAI } = require('@google/genai');
 const db = require('./dbService');
-
-const DEFAULT_MODEL = 'gemini-2.0-flash';
+const modelProvider = require('./modelProvider');
 
 class AdvancedAIService {
-  constructor() {
-    this.geminiClient = null;
-    this.initGeminiClient();
-  }
-
-  getApiKey() {
-    const key = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
-    if (key.trim().length > 5 && !key.startsWith('YOUR_')) return key.trim();
-    return null;
-  }
-
-  initGeminiClient() {
-    const apiKey = this.getApiKey();
-    if (!apiKey) {
-      this.geminiClient = null;
-      return;
-    }
-    try {
-      this.geminiClient = new GoogleGenAI({ apiKey });
-    } catch (err) {
-      console.error('[AdvancedAIService] Gemini client initialization error:', err.message);
-      this.geminiClient = null;
-    }
-  }
-
   // ── 1. AI Meeting Assistant ───────────────────────────────────────────────
   async summarizeMeeting(transcript, metadata = {}) {
     if (!transcript || typeof transcript !== 'string' || transcript.trim().length < 20) {
@@ -48,7 +21,7 @@ class AdvancedAIService {
 
     const { meetingTitle = 'Workplace Sync', attendees = [], department = 'General' } = metadata;
 
-    if (this.geminiClient) {
+    if (modelProvider.isConfigured()) {
       try {
         const prompt = `You are the INCLUAI Meeting Intelligence Assistant.
 Analyze the following meeting transcript for the meeting "${meetingTitle}" (Department: ${department}).
@@ -70,18 +43,18 @@ Provide an executive JSON response with:
   "accessibilityNotes": "Any accessibility, accommodation, or inclusion remarks mentioned"
 }`;
 
-        const response = await this.geminiClient.models.generateContent({
-          model: process.env.GEMINI_MODEL || DEFAULT_MODEL,
+        const response = await modelProvider.generate({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          config: { responseMimeType: 'application/json', temperature: 0.1 }
+          responseMimeType: 'application/json',
+          temperature: 0.1
         });
 
         if (response?.text) {
           const parsed = JSON.parse(response.text);
-          return { success: true, ...parsed, provider: 'Google Gemini (Live)' };
+          return { success: true, ...parsed, provider: response.provider };
         }
       } catch (err) {
-        console.warn('[AdvancedAIService] Meeting summarization Gemini fallback:', err.message);
+        console.warn('[AdvancedAIService] Meeting summarization AI fallback:', err.message);
       }
     }
 
@@ -126,7 +99,7 @@ Provide an executive JSON response with:
 
     const cleanText = text.trim();
 
-    if (this.geminiClient) {
+    if (modelProvider.isConfigured()) {
       try {
         const prompt = `Analyze the workplace sentiment of the following employee message or survey feedback.
 TEXT:
@@ -142,18 +115,18 @@ Respond with ONLY valid JSON:
   "recommendations": ["proactive management action"]
 }`;
 
-        const response = await this.geminiClient.models.generateContent({
-          model: process.env.GEMINI_MODEL || DEFAULT_MODEL,
+        const response = await modelProvider.generate({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          config: { responseMimeType: 'application/json', temperature: 0.1 }
+          responseMimeType: 'application/json',
+          temperature: 0.1
         });
 
         if (response?.text) {
           const parsed = JSON.parse(response.text);
-          return { success: true, text: cleanText, ...parsed, provider: 'Google Gemini (Live)' };
+          return { success: true, text: cleanText, ...parsed, provider: response.provider };
         }
       } catch (err) {
-        console.warn('[AdvancedAIService] Sentiment Gemini fallback:', err.message);
+        console.warn('[AdvancedAIService] Sentiment AI fallback:', err.message);
       }
     }
 
@@ -218,7 +191,7 @@ Respond with ONLY valid JSON:
       }))
     };
 
-    if (this.geminiClient && reports.length > 0) {
+    if (modelProvider.isConfigured() && reports.length > 0) {
       try {
         const prompt = `You are the Chief Accessibility & Inclusion Officer AI for INCLUAI 2.0.
 Generate an executive briefing report for Company ${companyId} based on this workplace barrier data:
@@ -235,18 +208,18 @@ Respond with JSON:
   "inclusionGrade": "A" | "B+" | "B" | "C" | "D"
 }`;
 
-        const response = await this.geminiClient.models.generateContent({
-          model: process.env.GEMINI_MODEL || DEFAULT_MODEL,
+        const response = await modelProvider.generate({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          config: { responseMimeType: 'application/json', temperature: 0.15 }
+          responseMimeType: 'application/json',
+          temperature: 0.15
         });
 
         if (response?.text) {
           const parsed = JSON.parse(response.text);
-          return { success: true, companyId, metrics: summaryData, ...parsed, provider: 'Google Gemini (Live)' };
+          return { success: true, companyId, metrics: summaryData, ...parsed, provider: response.provider };
         }
       } catch (err) {
-        console.warn('[AdvancedAIService] Report generation Gemini fallback:', err.message);
+        console.warn('[AdvancedAIService] Report generation AI fallback:', err.message);
       }
     }
 
@@ -337,7 +310,7 @@ Respond with JSON:
 
     const clean = inputDescription.trim();
 
-    if (this.geminiClient) {
+    if (modelProvider.isConfigured()) {
       try {
         const prompt = `You are a certified WCAG 2.1 AA and ADA Workplace Accessibility Auditor.
 Evaluate the following workplace item, UI feature, or physical space description:
@@ -355,18 +328,18 @@ Respond with valid JSON:
   "readabilityScore": "Grade level or score"
 }`;
 
-        const response = await this.geminiClient.models.generateContent({
-          model: process.env.GEMINI_MODEL || DEFAULT_MODEL,
+        const response = await modelProvider.generate({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          config: { responseMimeType: 'application/json', temperature: 0.1 }
+          responseMimeType: 'application/json',
+          temperature: 0.1
         });
 
         if (response?.text) {
           const parsed = JSON.parse(response.text);
-          return { success: true, ...parsed, provider: 'Google Gemini (Live)' };
+          return { success: true, ...parsed, provider: response.provider };
         }
       } catch (err) {
-        console.warn('[AdvancedAIService] Accessibility check Gemini fallback:', err.message);
+        console.warn('[AdvancedAIService] Accessibility check AI fallback:', err.message);
       }
     }
 

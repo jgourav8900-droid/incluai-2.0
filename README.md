@@ -50,9 +50,9 @@ Open:
 - Dataset explorer: <http://localhost:5000/dataset.html>
 - Health check: <http://localhost:5000/api/v2/observability/health>
 
-The app uses local JSON files by default. Keep `.env`, `data/db.json`, and uploaded documents private. For isolated runs, `INCLUAI_DATA_DIR` selects the writable database folder and `INCLUAI_DATASET_DIR` optionally selects the folder containing `employee_attrition.json` and `employee_attrition.csv`; the dataset API remains role-protected. Tests configure isolated temporary database and dataset folders; they do not need production credentials or a Gemini API key.
+The app uses local JSON files by default. Keep `.env`, `data/db.json`, and uploaded documents private. For isolated runs, `INCLUAI_DATA_DIR` selects the writable database folder and `INCLUAI_DATASET_DIR` optionally selects the folder containing `employee_attrition.json` and `employee_attrition.csv`; the dataset API remains role-protected. Tests configure isolated temporary database and dataset folders; they do not need production credentials or a hosted AI API key.
 
-For a deployment, configure a stable `JWT_SECRET` of at least 32 characters and set `NODE_ENV=production`. Never use the development demo accounts or sample data in a public deployment. Gemini integration is optional; without provider configuration, AI features use the app's offline behavior where supported.
+For a deployment, configure a stable `JWT_SECRET` of at least 32 characters and set `NODE_ENV=production`. Never use the development demo accounts or sample data in a public deployment. Text Copilot and advanced text-generation features support Gemini (`AI_PROVIDER=gemini`, `GEMINI_API_KEY`) or Claude (`AI_PROVIDER=anthropic`, `ANTHROPIC_API_KEY`, an Anthropic Console API key rather than an account/session token). Without a provider key, they use the app's offline behavior where supported. Gemini Live voice and embeddings remain Gemini-specific. The in-app Organization Admin provider setting applies only until the server restarts; it does not write API keys to disk.
 
 ## Security and prototype boundaries
 
@@ -79,7 +79,7 @@ Run the API and live-integration suites with:
 npm.cmd test
 ```
 
-The live tests validate the configured offline/degraded behavior when no Gemini key is present; they do not require a live third-party AI account.
+The live tests validate configured offline/degraded behavior when no hosted AI key is present; they do not require a live third-party AI account.
 
 ## Repository
 
