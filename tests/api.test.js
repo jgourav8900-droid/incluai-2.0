@@ -193,11 +193,17 @@ async function runTests() {
 
     // 12. Settings Preferences Update
     const settingsRes = await request('PUT', '/api/v2/settings', {
-      theme: 'dark',
-      language: 'English',
+      theme: 'royal',
+      language: 'es',
       emailNotifications: true
     }, empToken);
-    assert(settingsRes.status === 200 && settingsRes.body.preferences.emailNotifications === true, 'Settings preferences saved successfully');
+    assert(
+      settingsRes.status === 200 &&
+      settingsRes.body.preferences.emailNotifications === true &&
+      settingsRes.body.preferences.theme === 'royal' &&
+      settingsRes.body.preferences.language === 'es',
+      'Settings preferences save supported theme and language codes'
+    );
 
     // 13. Waitlist Reservation & JWT Token Issuance
     const waitlistEmail = `early_${Date.now()}@realfeels.internal`;

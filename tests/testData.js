@@ -3,8 +3,9 @@ const os = require('os');
 const path = require('path');
 
 function createTestData() {
-  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'incluai-test-'));
-  fs.writeFileSync(path.join(dataDir, 'employee_attrition.json'), JSON.stringify([
+  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'incluai-test-db-'));
+  const datasetDir = fs.mkdtempSync(path.join(os.tmpdir(), 'incluai-test-dataset-'));
+  fs.writeFileSync(path.join(datasetDir, 'employee_attrition.json'), JSON.stringify([
     {
       id: 1, Education: 'Bachelors', JoiningYear: 2017, City: 'Bangalore',
       PaymentTier: 3, Age: 28, Gender: 'Male', EverBenched: 'No',
@@ -16,9 +17,13 @@ function createTestData() {
       ExperienceInCurrentDomain: 5, LeaveOrNot: 1
     }
   ]));
-  fs.writeFileSync(path.join(dataDir, 'employee_attrition.csv'), 'Education,JoiningYear,City,PaymentTier,Age,Gender,EverBenched,ExperienceInCurrentDomain,LeaveOrNot\n');
+  fs.writeFileSync(path.join(datasetDir, 'employee_attrition.csv'), 'Education,JoiningYear,City,PaymentTier,Age,Gender,EverBenched,ExperienceInCurrentDomain,LeaveOrNot\n');
   process.env.INCLUAI_DATA_DIR = dataDir;
-  return () => fs.rmSync(dataDir, { recursive: true, force: true });
+  process.env.INCLUAI_DATASET_DIR = datasetDir;
+  return () => {
+    fs.rmSync(dataDir, { recursive: true, force: true });
+    fs.rmSync(datasetDir, { recursive: true, force: true });
+  };
 }
 
 module.exports = { createTestData };

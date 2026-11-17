@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { authenticateToken, requireRole } = require('../services/authService');
 
-const DATA_DIR = process.env.INCLUAI_DATA_DIR || path.join(__dirname, '..', 'data');
+const DATA_DIR = process.env.INCLUAI_DATASET_DIR || process.env.INCLUAI_DATA_DIR || path.join(__dirname, '..', 'data');
 const dataJsonPath = path.join(DATA_DIR, 'employee_attrition.json');
 const dataCsvPath = path.join(DATA_DIR, 'employee_attrition.csv');
 

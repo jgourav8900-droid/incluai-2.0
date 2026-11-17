@@ -1503,7 +1503,7 @@
       document.getElementById('themeSelector').value = themeId;
       
       // Sync with backend if user has token
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('incluai_token');
       if (token) {
         fetch('/api/v2/settings', {
           method: 'PUT',
@@ -1531,10 +1531,9 @@
       });
 
       renderTable();
-      runSimulation();
 
       // Sync with backend
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('incluai_token');
       if (token) {
         fetch('/api/v2/settings', {
           method: 'PUT',
@@ -1576,6 +1575,9 @@
         fetchStats(token);
         renderTable();
       } catch (err) {
+        const notice = document.getElementById('datasetAccessNotice');
+        notice.hidden = false;
+        notice.textContent = 'Could not connect to the workforce data service. Check the server and try again.';
         console.error('Failed to load dataset:', err);
       }
     }
@@ -1586,7 +1588,13 @@
         const res = await fetch('/api/v2/dataset/stats', {
           headers: { Authorization: 'Bearer ' + token }
         });
+        if (!res.ok) {
+          throw new Error(`Dataset statistics request failed with status ${res.status}.`);
+        }
         const json = await res.json();
+        if (!json.success || !json.stats) {
+          throw new Error(json.error || 'The dataset statistics response was invalid.');
+        }
         if (json.success && json.stats) {
           const s = json.stats;
           document.getElementById('statTotal').innerText = s.totalRecords.toLocaleString();
@@ -1602,7 +1610,7 @@
           renderCharts(s);
         }
       } catch (e) {
-        console.log('Stats calculation fallback');
+        console.error('Failed to load dataset statistics:', e);
       }
     }
 

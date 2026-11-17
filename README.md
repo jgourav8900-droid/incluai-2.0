@@ -50,7 +50,7 @@ Open:
 - Dataset explorer: <http://localhost:5000/dataset.html>
 - Health check: <http://localhost:5000/api/v2/observability/health>
 
-The app uses local JSON files by default. Keep `.env`, `data/db.json`, and uploaded documents private. Tests configure isolated temporary data; they do not need production credentials or a Gemini API key.
+The app uses local JSON files by default. Keep `.env`, `data/db.json`, and uploaded documents private. For isolated runs, `INCLUAI_DATA_DIR` selects the writable database folder and `INCLUAI_DATASET_DIR` optionally selects the folder containing `employee_attrition.json` and `employee_attrition.csv`; the dataset API remains role-protected. Tests configure isolated temporary database and dataset folders; they do not need production credentials or a Gemini API key.
 
 For a deployment, configure a stable `JWT_SECRET` of at least 32 characters and set `NODE_ENV=production`. Never use the development demo accounts or sample data in a public deployment. Gemini integration is optional; without provider configuration, AI features use the app's offline behavior where supported.
 

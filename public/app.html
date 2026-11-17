@@ -1321,8 +1321,7 @@
       .top-header { padding: 10px 18px; gap: 14px; }
       .header-nav { gap: 12px; }
       #publicAuthActions { gap: 8px; }
-      #publicAuthActions #publicThemeSelect,
-      #publicAuthActions #publicLangSelect { display: none; }
+      #publicAuthActions #publicThemeSelect { display: none; }
     }
 
     @media (max-width: 860px) {
@@ -2377,18 +2376,24 @@
               <div class="form-group">
                 <label class="form-label">Interface Theme</label>
                 <select id="prefTheme" class="form-control">
-                  <option value="dark" selected>Dark Enterprise (Default)</option>
-                  <option value="light">Light</option>
+                  <option value="cyber-dark">Cyber Midnight</option>
+                  <option value="obsidian">Obsidian OLED</option>
+                  <option value="emerald">Matrix Emerald</option>
+                  <option value="royal">Royal Nebula</option>
+                  <option value="glacier">Glacier Crisp</option>
+                  <option value="solar">Solar Amber</option>
                 </select>
               </div>
 
               <div class="form-group">
                 <label class="form-label">Language</label>
                 <select id="prefLanguage" class="form-control">
-                  <option value="English" selected>English</option>
-                  <option value="Spanish">Spanish</option>
-                  <option value="French">French</option>
-                  <option value="Hindi">Hindi</option>
+                  <option value="en">English</option>
+                  <option value="es">Español</option>
+                  <option value="fr">Français</option>
+                  <option value="de">Deutsch</option>
+                  <option value="hi">हिन्दी</option>
+                  <option value="ja">日本語</option>
                 </select>
               </div>
 
@@ -3949,8 +3954,10 @@
         });
         const data = await res.json();
         if (data.success && data.preferences) {
-          document.getElementById('prefTheme').value = data.preferences.theme || 'dark';
-          document.getElementById('prefLanguage').value = data.preferences.language || 'English';
+          const theme = normalizeThemeId(data.preferences.theme);
+          const language = normalizeLanguageCode(data.preferences.language);
+          applyGlobalTheme(theme, false);
+          applyGlobalLanguage(language, false);
           document.getElementById('prefEmailNotifs').checked = Boolean(data.preferences.emailNotifications);
         }
       } catch (err) {
@@ -3972,7 +3979,12 @@
           body: JSON.stringify({ theme, language, emailNotifications })
         });
         const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Could not save your preferences.');
+        }
         if (data.success) {
+          applyGlobalTheme(data.preferences.theme || theme, false);
+          applyGlobalLanguage(data.preferences.language || language, false);
           alertBox.innerHTML = `<div class="alert alert-success">✓ Preferences saved successfully.</div>`;
         }
       } catch (err) {
@@ -4285,8 +4297,29 @@
     // =========================================================================
     // GLOBAL THEME & LANGUAGE MANAGEMENT (BACKEND + FRONTEND)
     // =========================================================================
-    function applyGlobalTheme(themeId) {
-      if (!themeId) themeId = 'cyber-dark';
+    const GLOBAL_THEMES = ['cyber-dark', 'obsidian', 'emerald', 'royal', 'glacier', 'solar'];
+    const GLOBAL_LANGUAGES = ['en', 'es', 'fr', 'de', 'hi', 'ja'];
+    const LEGACY_LANGUAGE_CODES = {
+      english: 'en',
+      spanish: 'es',
+      french: 'fr',
+      german: 'de',
+      hindi: 'hi',
+      japanese: 'ja'
+    };
+
+    function normalizeThemeId(themeId) {
+      return GLOBAL_THEMES.includes(themeId) ? themeId : 'cyber-dark';
+    }
+
+    function normalizeLanguageCode(language) {
+      const code = String(language || 'en').trim().toLowerCase();
+      if (GLOBAL_LANGUAGES.includes(code)) return code;
+      return LEGACY_LANGUAGE_CODES[code] || 'en';
+    }
+
+    function applyGlobalTheme(themeId, syncBackend = true) {
+      themeId = normalizeThemeId(themeId);
       document.documentElement.setAttribute('data-theme', themeId);
       document.body.setAttribute('data-theme', themeId);
       localStorage.setItem('incluai_theme', themeId);
@@ -4298,7 +4331,7 @@
       const prefSelect = document.getElementById('prefTheme');
       if (prefSelect) prefSelect.value = themeId;
 
-      if (authToken) {
+      if (authToken && syncBackend) {
         fetch('/api/v2/settings', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
@@ -4307,8 +4340,8 @@
       }
     }
 
-    function applyGlobalLanguage(langCode) {
-      if (!langCode) langCode = 'en';
+    function applyGlobalLanguage(langCode, syncBackend = true) {
+      langCode = normalizeLanguageCode(langCode);
       document.documentElement.setAttribute('data-lang', langCode);
       localStorage.setItem('incluai_lang', langCode);
 
@@ -4319,7 +4352,7 @@
       const prefLang = document.getElementById('prefLanguage');
       if (prefLang) prefLang.value = langCode;
 
-      if (authToken) {
+      if (authToken && syncBackend) {
         fetch('/api/v2/settings', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
